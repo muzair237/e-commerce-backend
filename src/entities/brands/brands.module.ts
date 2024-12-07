@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { BrandsController } from './brands.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { SequelizeModule } from '@nestjs/sequelize';
 import { Brand } from '../../models/brand.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Brand])],
+  imports: [SequelizeModule.forFeature([Brand])],
   controllers: [BrandsController],
   providers: [BrandsService],
 })

@@ -5,9 +5,7 @@ export const getEnvVariables = (
 ): {
   PORT: number;
 
-  HOST_NAME: string;
-  DATABASE_NAME: string;
-  PASSWORD: string;
+  DATABASE_URI: string;
 
   CLOUD_NAME: string;
   API_KEY: string;
@@ -16,9 +14,7 @@ export const getEnvVariables = (
   PORT: configService.get<number>('PORT'),
 
   // DATABASE
-  HOST_NAME: configService.get<string>('HOST_NAME'),
-  DATABASE_NAME: configService.get<string>('DATABASE_NAME'),
-  PASSWORD: configService.get<string>('PASSWORD'),
+  DATABASE_URI: configService.get<string>('DATABASE_URI'),
 
   //CLOUDINARY
   CLOUD_NAME: configService.get<string>('CLOUD_NAME'),

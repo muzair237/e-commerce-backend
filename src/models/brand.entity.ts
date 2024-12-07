@@ -1,18 +1,25 @@
-import { IsString, IsNotEmpty } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
-@Entity()
-export class Brand {
-  @PrimaryGeneratedColumn()
+@Table({
+  tableName: 'brands',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+})
+export class Brand extends Model<Brand> {
+  @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
-  @Column()
-  @IsString()
-  @IsNotEmpty()
+  @Column({
+    type: DataType.STRING,
+    unique: true,
+    allowNull: false,
+  })
   name: string;
 
-  @Column()
-  @IsString()
-  @IsNotEmpty()
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   logo: string;
 }

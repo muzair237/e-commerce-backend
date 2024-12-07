@@ -1,35 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { Brand } from 'src/models/brand.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/sequelize';
 import { uploadFileToCloudinary } from 'src/utils/uploadFIle';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BrandsService {
   constructor(
-    @InjectRepository(Brand) private readonly brandRepository: Repository<Brand>,
+    @InjectModel(Brand) private readonly BRAND: typeof Brand,
     private readonly configService: ConfigService,
   ) {}
 
-  findAll() {
-    return this.brandRepository.find();
+  async findAll(): Promise<Record<string, any>> {
+    const brands = await this.BRAND.findAll();
+    return { success: true, message: 'Brand retrieved successfully!', brands };
   }
 
   async createBrand(brand: any, logoBuffer: Buffer): Promise<Record<string, any>> {
     try {
       const logoUrl = await uploadFileToCloudinary(this.configService, logoBuffer);
 
-      const newBrand = this.brandRepository.create({
+      await this.BRAND.create({
         ...brand,
         logo: logoUrl,
       });
 
-      await this.brandRepository.save(newBrand);
-
       return { success: true, message: 'Brand created successfully!' };
-    } catch {
-      throw new Error('Failed to create brand');
+    } catch (error) {
+      throw new Error(`Failed to create brand: ${error.message}`);
     }
   }
 }

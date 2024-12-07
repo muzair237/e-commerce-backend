@@ -12,6 +12,9 @@ export class CustomFileInterceptor {
         }
         cb(null, true);
       },
+      limits: {
+        fileSize: 1 * 1024 * 1024,
+      },
     });
   }
 }
