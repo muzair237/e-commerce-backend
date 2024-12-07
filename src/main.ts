@@ -1,8 +1,26 @@
+/* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import * as compression from 'compression';
+import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import * as morgan from 'morgan';
 
 async function bootstrap() {
+  const port = process.env.PORT || 4001;
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  app.setGlobalPrefix('api');
+
+  app.enableCors({
+    origin: [],
+  });
+  app.use(compression());
+  app.use(cookieParser());
+  app.use(helmet());
+  app.use(morgan(':date[iso] - :method - :url - :status - :response-time ms'));
+  app.useGlobalPipes(new ValidationPipe());
+
+  await app.listen(port, () => console.log(`Server started on port ${port}`));
 }
 bootstrap();

@@ -6,10 +6,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-  ],
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   root: true,
   env: {
     node: true,
@@ -38,11 +35,8 @@ module.exports = {
     'no-useless-concat': 'error',
     'no-useless-return': 'error',
     'no-constant-condition': 'warn',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      { argsIgnorePattern: 'req|res|next|__' },
-    ],
-    indent: ['error', 2, { SwitchCase: 1 }],
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: 'req|res|next|__' }],
+    // indent: ['error', 2, { SwitchCase: 1 }],
     'no-mixed-spaces-and-tabs': 'warn',
     'space-before-blocks': 'error',
     'space-in-parens': 'error',
@@ -57,10 +51,7 @@ module.exports = {
     'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1 }],
     'no-whitespace-before-property': 'error',
     'nonblock-statement-body-position': 'error',
-    'object-property-newline': [
-      'error',
-      { allowAllPropertiesOnSameLine: true },
-    ],
+    'object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
     'arrow-spacing': 'error',
     'no-confusing-arrow': 'error',
     'no-duplicate-imports': 'error',

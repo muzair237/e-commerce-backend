@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run E-Commerce Backend",
+      "type": "npm",
+      "script": "start:dev",
+      "detail": "Starts the monolith backend",
+      "problemMatcher": []
+    }
+  ]
+}
