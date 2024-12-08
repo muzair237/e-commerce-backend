@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
+import { Product } from './product.entity';
 
 @Table({
   tableName: 'brands',
@@ -7,6 +8,9 @@ import { Column, Model, Table, DataType } from 'sequelize-typescript';
   updatedAt: 'updated_at',
 })
 export class Brand extends Model<Brand> {
+  @HasMany(() => Product)
+  variations: Product[];
+
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
