@@ -1,6 +1,14 @@
 import { Column, Model, Table, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import {
+  RamSizes,
+  ProcessorNames,
+  ProcessorGenerations,
+  StorageTypes,
+  StorageSizes,
+  GraphicsCardTypes,
+  GraphicsCardMemorySizes,
+} from 'src/utils/enums';
 import { Product } from './product.entity';
-import { RamSizes, ProcessorNames, ProcessorGenerations } from 'src/utils/enums';
 
 @Table({
   tableName: 'product_variations',
@@ -23,6 +31,15 @@ export class ProductVariation extends Model<ProductVariation> {
   productId: number;
 
   @Column({
+    type: DataType.JSONB,
+    allowNull: false,
+  })
+  storage: {
+    type: StorageTypes;
+    size: StorageSizes;
+  };
+
+  @Column({
     type: DataType.ENUM(...Object.values(RamSizes)),
     allowNull: false,
   })
@@ -35,6 +52,17 @@ export class ProductVariation extends Model<ProductVariation> {
   processor: {
     name: ProcessorNames;
     generation: ProcessorGenerations;
+  };
+
+  @Column({
+    type: DataType.JSONB,
+    allowNull: false,
+  })
+  graphicsCard: {
+    isGraphicsCard: boolean;
+    type: GraphicsCardTypes;
+    // model:
+    memory: GraphicsCardMemorySizes;
   };
 
   @Column({

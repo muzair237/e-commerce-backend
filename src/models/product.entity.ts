@@ -23,6 +23,12 @@ export class Product extends Model<Product> {
     type: DataType.STRING,
     allowNull: false,
   })
+  name: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   model: string;
 
   @Column({
@@ -45,10 +51,8 @@ export class Product extends Model<Product> {
   images: string[];
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM(...Object.values(ScreenSizes)),
     allowNull: false,
   })
-  screenSize: {
-    size: ScreenSizes;
-  };
+  screenSize: ScreenSizes;
 }

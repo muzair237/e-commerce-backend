@@ -18,6 +18,9 @@ export class Brand extends Model<Brand> {
     type: DataType.STRING,
     unique: true,
     allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
   })
   name: string;
 

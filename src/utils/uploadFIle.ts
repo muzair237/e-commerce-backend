@@ -7,11 +7,14 @@ export const configureCloudinary = (configService: ConfigService) => {
   cloudinary.config(config);
 };
 
-export const uploadFileToCloudinary = async (configService: ConfigService, fileBuffer: Buffer): Promise<string> => {
+export const uploadFileToCloudinary = async (
+  configService: ConfigService,
+  file: Express.Multer.File,
+): Promise<string> => {
   try {
     configureCloudinary(configService);
 
-    const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${fileBuffer.toString('base64')}`);
+    const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${file.buffer.toString('base64')}`);
     return result.secure_url;
   } catch (error) {
     throw new Error(`Error in uploading image: ${error.message}`);

@@ -1,11 +1,25 @@
 export enum ScreenSizes {
-  INCH_11 = '11',
-  INCH_12 = '12',
-  INCH_13 = '13',
-  INCH_14 = '14',
-  INCH_15 = '15',
-  INCH_16 = '16',
-  INCH_17 = '17',
+  INCH_11 = '11 inches',
+  INCH_12 = '12 inches',
+  INCH_13 = '13 inches',
+  INCH_14 = '14 inches',
+  INCH_15 = '15 inches',
+  INCH_16 = '16 inches',
+  INCH_17 = '17 inches',
+}
+
+export enum StorageTypes {
+  HDD = 'HDD',
+  SSD = 'SSD',
+}
+
+export enum StorageSizes {
+  GB_128 = '128GB',
+  GB_256 = '256GB',
+  GB_512 = '512GB',
+  TB_1 = '1TB',
+  TB_2 = '2TB',
+  TB_4 = '4TB',
 }
 
 export enum RamSizes {
@@ -56,4 +70,20 @@ export enum ProcessorGenerations {
   GEN_14 = '14th Gen',
   // No generations for Apple M1/M2
   APPLE_M1_M2 = 'Apple M1/M2 Series',
+}
+
+export enum GraphicsCardTypes {
+  RTX = 'RTX',
+  GTX = 'GTX',
+  QUADRO = 'Quadro',
+  RADEON = 'Radeon',
+}
+
+export enum GraphicsCardMemorySizes {
+  GB_1 = '1GB',
+  GB_2 = '2GB',
+  GB_4 = '4GB',
+  GB_8 = '8GB',
+  GB_12 = '12GB',
+  GB_16 = '16GB',
 }
