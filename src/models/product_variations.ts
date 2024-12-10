@@ -1,4 +1,4 @@
-import { Column, Model, Table, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, ForeignKey } from 'sequelize-typescript';
 import {
   RamSizes,
   ProcessorNames,
@@ -17,9 +17,6 @@ import { Product } from './product.entity';
   updatedAt: 'updated_at',
 })
 export class ProductVariation extends Model<ProductVariation> {
-  @BelongsTo(() => Product)
-  product: Product;
-
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
@@ -61,7 +58,6 @@ export class ProductVariation extends Model<ProductVariation> {
   graphicsCard: {
     isGraphicsCard: boolean;
     type: GraphicsCardTypes;
-    // model:
     memory: GraphicsCardMemorySizes;
   };
 

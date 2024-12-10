@@ -1,12 +1,12 @@
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'brands',
+  tableName: 'roles',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 })
-export class Brand extends Model<Brand> {
+export class Role extends Model<Role> {
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
@@ -18,11 +18,20 @@ export class Brand extends Model<Brand> {
       notEmpty: true,
     },
   })
-  name: string;
+  type: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
   })
-  logo: string;
+  description: string;
+
+  @Column({
+    type: DataType.ARRAY(DataType.INTEGER),
+    allowNull: false,
+  })
+  permissions: number[];
 }

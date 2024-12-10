@@ -1,7 +1,7 @@
-import { Column, Model, Table, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { ProductVariation } from './product_variations';
+import { Column, Model, Table, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Brand } from './brand.entity';
 import { ScreenSizes } from 'src/utils/enums';
+import { ProductVariation } from './product_variations';
 
 @Table({
   tableName: 'products',
@@ -10,11 +10,11 @@ import { ScreenSizes } from 'src/utils/enums';
   updatedAt: 'updated_at',
 })
 export class Product extends Model<Product> {
-  @HasMany(() => ProductVariation)
-  variations: ProductVariation[];
-
   @BelongsTo(() => Brand)
   brand: Brand;
+
+  @HasMany(() => ProductVariation)
+  variations: ProductVariation[];
 
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;

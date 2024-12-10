@@ -1,14 +1,23 @@
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'brands',
+  tableName: 'permissions',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
 })
-export class Brand extends Model<Brand> {
+export class Permission extends Model<Permission> {
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  })
+  route: string;
 
   @Column({
     type: DataType.STRING,
@@ -18,11 +27,14 @@ export class Brand extends Model<Brand> {
       notEmpty: true,
     },
   })
-  name: string;
+  can: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
   })
-  logo: string;
+  description: string;
 }
