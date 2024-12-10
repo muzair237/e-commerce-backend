@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseInterceptors, Res } from '@nestjs/common';
+import { Controller, Get, Post, UseInterceptors, Res } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { Request, Response } from 'express';

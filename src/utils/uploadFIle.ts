@@ -1,3 +1,4 @@
+import { Express } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { cloudinaryConfig } from '../config/cloudinary.config';
