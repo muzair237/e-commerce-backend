@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PaginationResult } from './interfaces';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class Helpers {
@@ -20,5 +21,11 @@ export class Helpers {
       lastPage: Math.ceil(totalItems / itemsPerPage),
       totalItems,
     };
+  };
+
+  hashPassword = (password: string): string => {
+    const salt: string = bcryptjs.genSaltSync(10);
+    const passwordHashed: string = bcryptjs.hashSync(password, salt);
+    return passwordHashed;
   };
 }

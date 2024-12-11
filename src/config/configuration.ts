@@ -7,6 +7,10 @@ export const getEnvVariables = (
 
   DATABASE_URI: string;
 
+  ADMIN_EMAIL: string;
+  ADMIN_PASSWORD: string;
+  ADMIN_ROLE: string;
+
   CLOUD_NAME: string;
   API_KEY: string;
   API_SECRET: string;
@@ -15,6 +19,11 @@ export const getEnvVariables = (
 
   // DATABASE
   DATABASE_URI: configService.get<string>('DATABASE_URI'),
+
+  // ADMIN
+  ADMIN_EMAIL: configService.get<string>('ADMIN_EMAIL'),
+  ADMIN_PASSWORD: configService.get<string>('ADMIN_PASSWORD'),
+  ADMIN_ROLE: configService.get<string>('ADMIN_ROLE'),
 
   //CLOUDINARY
   CLOUD_NAME: configService.get<string>('CLOUD_NAME'),

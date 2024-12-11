@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Brand } from 'src/models/brand.entity';
+import { Brand } from 'src/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { uploadFileToCloudinary } from 'src/utils/uploadFIle';
 import { ConfigService } from '@nestjs/config';

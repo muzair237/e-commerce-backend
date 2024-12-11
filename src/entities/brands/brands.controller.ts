@@ -8,7 +8,7 @@ import { RequestDecorator } from 'src/utils/decorators/requestDecorator';
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
   @Get('get-all-brands')
-  async(@RequestDecorator() req: Request, @Res() res: Response) {
+  getAllBrands(@RequestDecorator() req: Request, @Res() res: Response) {
     return this.brandsService.getAllBrands(req, res);
   }
 

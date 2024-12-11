@@ -40,6 +40,12 @@ export class Admin extends Model<Admin> {
   password: string;
 
   @Column({
+    type: DataType.ARRAY(DataType.STRING),
+    allowNull: false,
+  })
+  permissions: string[];
+
+  @Column({
     type: DataType.ARRAY(DataType.INTEGER),
     allowNull: false,
   })
