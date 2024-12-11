@@ -1,4 +1,5 @@
 import { Express } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { cloudinaryConfig } from '../config/cloudinary.config';
@@ -18,6 +19,6 @@ export const uploadFileToCloudinary = async (
     const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${file.buffer.toString('base64')}`);
     return result.secure_url;
   } catch (error) {
-    throw new Error(`Error in uploading image: ${error.message}`);
+    throw new HttpException(`Error in uploading image: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 };

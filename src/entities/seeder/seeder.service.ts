@@ -1,20 +1,17 @@
-/* eslint-disable no-console */
-
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Role, Permission, Admin } from 'src/models';
 import { permissionsList } from 'src/utils/seeders/permissionsList';
-import { rolesList } from 'src/utils/seeders/rolesList';
 import { Transaction } from 'sequelize';
-import { getEnvVariables } from 'src/config/configuration';
 import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
+import { getEnvVariables } from 'src/config/configuration';
 
 @Injectable()
 export class SeederService {
   private readonly ADMIN_EMAIL: string;
   private readonly ADMIN_PASSWORD: string;
-  private readonly ADMIN_ROLE: string;
+
   constructor(
     @InjectModel(Permission) private readonly PERMISSION: typeof Permission,
     @InjectModel(Role) private readonly ROLE: typeof Role,
@@ -22,86 +19,57 @@ export class SeederService {
     private readonly configService: ConfigService,
     private readonly helper: Helpers,
   ) {
-    ({
-      ADMIN_EMAIL: this.ADMIN_EMAIL,
-      ADMIN_PASSWORD: this.ADMIN_PASSWORD,
-      ADMIN_ROLE: this.ADMIN_ROLE,
-    } = getEnvVariables(configService));
+    ({ ADMIN_EMAIL: this.ADMIN_EMAIL, ADMIN_PASSWORD: this.ADMIN_PASSWORD } = getEnvVariables(configService));
   }
 
   async seedPermissionsAndRoles(transaction: Transaction) {
     try {
-      const permissions = await this.PERMISSION.findAll({ transaction });
-      const permissionToCreate = permissionsList.filter(
-        perm => !permissions.some(existingPerm => existingPerm.can === perm.can),
-      );
-
-      if (permissionToCreate.length > 0) {
-        await this.PERMISSION.bulkCreate(permissionToCreate, { ignoreDuplicates: true, transaction });
+      for (const permission of permissionsList) {
+        await this.PERMISSION.upsert(permission, { transaction });
       }
 
-      const roles = await this.ROLE.findAll({ transaction });
-      const rolesToCreate = rolesList.filter(role => !roles.some(existingRole => existingRole.type === role.type));
+      const permissions = await this.PERMISSION.findAll({ transaction });
 
-      await Promise.all(
-        rolesToCreate.map(async role => {
-          const newPermissions = await this.PERMISSION.findAll({
-            where: { can: role.permissions.map(val => val.can) },
-            transaction,
-          });
-
-          const permissionIds = newPermissions.map(perm => perm.id);
-
-          await this.ROLE.bulkCreate(
-            [
-              {
-                type: role.type,
-                description: role.description,
-                permissions: permissionIds,
-              },
-            ],
-            { ignoreDuplicates: true, transaction },
-          );
-        }),
+      await this.ROLE.upsert(
+        {
+          type: 'SUPER_ADMIN',
+          description: 'Role for Super Admin',
+          permissions: permissions.map(({ id }) => id),
+        },
+        {
+          transaction,
+          conflictFields: ['type'],
+        },
       );
-    } catch (err) {
-      throw new HttpException(`Failed to seed roles and permissions: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error) {
+      throw new HttpException(
+        `Failed to seed permissions and roles: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async createFirstAdmin(transaction: Transaction) {
     try {
-      const existingAdmin = await this.ADMIN.findOne({ transaction });
-      if (existingAdmin) return;
-      console.log('Hashing....');
-      const hashedPassword = this.helper.hashPassword(this.ADMIN_PASSWORD);
-
-      const roles = await this.ROLE.findAll({
-        where: { type: this.ADMIN_ROLE },
+      const role = await this.ROLE.findOne({
+        where: { type: 'SUPER_ADMIN' },
         transaction,
       });
 
-      const permissionsFindArray = roles.flatMap(role => role.permissions);
+      const permissions = await this.PERMISSION.findAll({ transaction });
 
-      const permissions = await this.PERMISSION.findAll({
-        where: { id: permissionsFindArray },
-        transaction,
-      });
-
-      const permissionCans = permissions.map(permission => permission.can);
-
-      await this.ADMIN.create(
+      await this.ADMIN.upsert(
         {
-          name: 'admin',
+          name: 'Admin',
           email: this.ADMIN_EMAIL,
-          password: hashedPassword,
-          permissions: permissionCans,
-          roles: [roles[0].id],
+          password: this.helper.hashPassword(this.ADMIN_PASSWORD),
+          permissions: permissions?.map(({ can }) => can),
+          roles: [role.id],
         },
         { transaction },
       );
-    } catch (err) {
-      throw new HttpException(`Failed to create the first admin: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (error) {
+      throw new HttpException(`Failed to create the first admin: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
