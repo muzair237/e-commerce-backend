@@ -1,7 +1,7 @@
 import { Column, Model, Table, DataType, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { Brand } from './brand.entity';
+import { Brand } from './brand.model';
 import { ScreenSizes } from 'src/utils/enums';
-import { ProductVariation } from './product_variations';
+import { ProductVariation } from './product_variation.model';
 
 @Table({
   tableName: 'products',

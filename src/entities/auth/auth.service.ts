@@ -18,7 +18,7 @@ export class AuthService {
 
       const admin = await this.ADMIN.findOne({ where: { email }, raw: true });
       if (!admin || !this.helpers.comparePassword(password, admin?.password)) {
-        return res.status(HttpStatus.NOT_FOUND).json({ success: false, message: 'Incorrect email or password!' });
+        return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: 'Incorrect email or password!' });
       }
 
       delete admin.password;
@@ -42,7 +42,7 @@ export class AuthService {
         token,
       });
     } catch (err) {
-      throw new HttpException(`Failed to login admin: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException({ success: false, message: err.message }, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

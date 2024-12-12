@@ -1,5 +1,5 @@
 import { Column, Model, Table, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Admin } from './admin.entity';
+import { Admin } from './admin.model';
 
 @Table({
   tableName: 'admin_jwts',

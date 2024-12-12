@@ -8,7 +8,7 @@ import {
   GraphicsCardTypes,
   GraphicsCardMemorySizes,
 } from 'src/utils/enums';
-import { Product } from './product.entity';
+import { Product } from './product.model';
 
 @Table({
   tableName: 'product_variations',
