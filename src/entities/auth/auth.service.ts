@@ -1,8 +1,8 @@
-import { HttpStatus, Injectable, HttpException } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Admin, AdminJwt } from 'src/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { Helpers } from 'src/utils/helpers';
+import { LoginDto } from './dto/login-dto';
 
 @Injectable()
 export class AuthService {
@@ -12,19 +12,22 @@ export class AuthService {
     private readonly helpers: Helpers,
   ) {}
 
-  async adminLogin(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
+  async adminLogin(loginInfo: LoginDto) {
+    const { email, password } = loginInfo;
 
+    try {
       const admin = await this.ADMIN.findOne({ where: { email }, raw: true });
+
       if (!admin || !this.helpers.comparePassword(password, admin?.password)) {
-        return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: 'Incorrect email or password!' });
+        throw new HttpException('Invalid login credentials!', HttpStatus.UNAUTHORIZED);
       }
 
       delete admin.password;
 
       const token = this.helpers.generateJWTToken({ id: admin?.id, email });
+
       const { iat, exp } = this.helpers.decryptToken(token);
+
       await this.ADMIN_JWT.upsert(
         {
           admin_id: admin?.id,
@@ -36,13 +39,14 @@ export class AuthService {
           conflictFields: ['admin_id'],
         },
       );
-      return res.status(HttpStatus.OK).json({
+
+      return {
         success: true,
         message: 'Logged in successfully!',
         token,
-      });
+      };
     } catch (err) {
-      throw new HttpException({ success: false, message: err.message }, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.helpers.handleException(err);
     }
   }
 }

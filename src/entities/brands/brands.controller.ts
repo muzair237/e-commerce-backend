@@ -1,21 +1,26 @@
-import { Controller, Get, Post, UseInterceptors, Res } from '@nestjs/common';
+import { Controller, Get, Post, UseInterceptors, Body, Query, UploadedFile, UsePipes } from '@nestjs/common';
+import { Express } from 'express';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { Request, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RequestDecorator } from 'src/utils/decorators/requestDecorator';
+import { QueryParamsInterface } from 'src/utils/interfaces';
+import { QueryParamsValidationPipe } from 'src/utils/pipes/queryParams.pipe';
+import { FileValidationPipe } from 'src/utils/pipes/file.pipe';
 
 @Controller('brands')
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
+
   @Get('get-all-brands')
-  getAllBrands(@RequestDecorator() req: Request, @Res() res: Response) {
-    return this.brandsService.getAllBrands(req, res);
+  async getAllBrands(@Query(QueryParamsValidationPipe) query: QueryParamsInterface) {
+    return await this.brandsService.getAllBrands(query);
   }
 
+  // Create a new brand with file validation
   @Post('create-brand')
   @UseInterceptors(FileInterceptor('logo'))
-  async createBrand(@RequestDecorator(CreateBrandDto) req: Request, @Res() res: Response) {
-    return this.brandsService.createBrand(req, res);
+  @UsePipes(FileValidationPipe)
+  async createBrand(@Body() brand: CreateBrandDto, @UploadedFile() logo: Express.Multer.File) {
+    return await this.brandsService.createBrand(brand, logo);
   }
 }

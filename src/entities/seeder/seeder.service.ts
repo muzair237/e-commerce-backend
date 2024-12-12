@@ -6,6 +6,7 @@ import { Transaction } from 'sequelize';
 import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { getEnvVariables } from 'src/config/configuration';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class SeederService {
@@ -18,6 +19,7 @@ export class SeederService {
     @InjectModel(Admin) private readonly ADMIN: typeof Admin,
     private readonly configService: ConfigService,
     private readonly helper: Helpers,
+    private readonly sequelize: Sequelize,
   ) {
     ({ ADMIN_EMAIL: this.ADMIN_EMAIL, ADMIN_PASSWORD: this.ADMIN_PASSWORD } = getEnvVariables(configService));
   }
@@ -70,6 +72,22 @@ export class SeederService {
       );
     } catch (error) {
       throw new HttpException(`Failed to create the first admin: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async seedRPA() {
+    const transaction = await this.sequelize.transaction();
+
+    try {
+      await this.seedPermissionsAndRoles(transaction);
+      await this.createFirstAdmin(transaction);
+
+      await transaction.commit();
+
+      return { message: 'Permissons, Roles and Admin seeded successfully' };
+    } catch (err) {
+      await transaction.rollback();
+      throw new HttpException(`Seeding failed: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

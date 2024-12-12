@@ -1,27 +1,22 @@
-import { Express } from 'express';
-import {
-  Injectable,
-  PipeTransform,
-  BadRequestException,
-  FileTypeValidator,
-  MaxFileSizeValidator,
-  ParseFilePipe,
-} from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
   transform(file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('File is required');
+      throw new BadRequestException('No file uploaded');
     }
 
-    const parseFilePipe = new ParseFilePipe({
-      validators: [
-        new MaxFileSizeValidator({ maxSize: 1 * 1024 * 1024 }),
-        new FileTypeValidator({ fileType: /image\/(jpeg|jpg|png)/ }),
-      ],
-    });
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type. Only JPEG, PNG, and GIF are allowed.');
+    }
 
-    return parseFilePipe.transform(file);
+    const maxSize = 1 * 1024 * 1024;
+    if (file.size > maxSize) {
+      throw new BadRequestException('File size exceeds the 2MB limit');
+    }
+
+    return file;
   }
 }

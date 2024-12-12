@@ -1,22 +1,22 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+import { QueryParamsInterface } from 'src/utils/interfaces';
 
 @Injectable()
 export class QueryParamsValidationPipe implements PipeTransform {
-  transform(value: any) {
-    const transformedValue = {
-      ...value,
-      page: value.page ? parseInt(value.page, 10) : undefined,
-      itemsPerPage: value.itemsPerPage ? parseInt(value.itemsPerPage, 10) : undefined,
-      getAll: value.getAll === 'true',
+  transform(value: QueryParamsInterface) {
+    const { page, itemsPerPage, getAll } = value;
+
+    if (page && isNaN(Number(page))) {
+      throw new BadRequestException('Page must be a number');
+    }
+    if (itemsPerPage && isNaN(Number(itemsPerPage))) {
+      throw new BadRequestException('Items per page must be a number');
+    }
+
+    return {
+      page: page ? Number(page) : 1,
+      itemsPerPage: itemsPerPage ? Number(itemsPerPage) : 10,
+      getAll: getAll ? Boolean(getAll) : false,
     };
-
-    if (isNaN(transformedValue.page)) {
-      throw new BadRequestException('Invalid page number');
-    }
-    if (isNaN(transformedValue.itemsPerPage)) {
-      throw new BadRequestException('Invalid itemsPerPage value');
-    }
-
-    return transformedValue;
   }
 }

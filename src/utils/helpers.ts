@@ -62,4 +62,18 @@ export class Helpers {
 
     return { iat, exp };
   };
+
+  handleException = (err: any) => {
+    if (err instanceof HttpException) {
+      throw err;
+    }
+
+    throw new HttpException(
+      {
+        success: false,
+        message: err.message || 'Internal server error',
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  };
 }
