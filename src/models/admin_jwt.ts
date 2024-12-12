@@ -2,7 +2,7 @@ import { Column, Model, Table, DataType, ForeignKey, BelongsTo } from 'sequelize
 import { Admin } from './admin.entity';
 
 @Table({
-  tableName: 'admin_jwt',
+  tableName: 'admin_jwts',
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
@@ -18,6 +18,7 @@ export class AdminJwt extends Model<AdminJwt> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
+    unique: true,
     validate: {
       notEmpty: true,
     },

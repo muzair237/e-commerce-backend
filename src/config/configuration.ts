@@ -13,6 +13,8 @@ export const getEnvVariables = (
   CLOUD_NAME: string;
   API_KEY: string;
   API_SECRET: string;
+
+  JWT_SECRET: string;
 } => ({
   PORT: configService.get<number>('PORT'),
 
@@ -27,4 +29,7 @@ export const getEnvVariables = (
   CLOUD_NAME: configService.get<string>('CLOUD_NAME'),
   API_KEY: configService.get<string>('API_KEY'),
   API_SECRET: configService.get<string>('API_SECRET'),
+
+  //JWT_SECRET
+  JWT_SECRET: configService.get<string>('JWT_SECRET'),
 });

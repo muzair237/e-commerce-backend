@@ -19,6 +19,10 @@ export const RequestDecorator = createParamDecorator(
     }
 
     const body = req.body;
+    if (dto && (!body || Object.keys(body).length === 0)) {
+      throw new BadRequestException('Request body is required but missing');
+    }
+
     if (body && Object.keys(body).length > 0) {
       const dtoInstance = plainToInstance(dto, body);
       const errors = await validate(dtoInstance);

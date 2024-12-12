@@ -4,6 +4,7 @@ import { CreateBrandDto } from './dto/create-brand.dto';
 import { Request, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RequestDecorator } from 'src/utils/decorators/requestDecorator';
+
 @Controller('brands')
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
