@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Admin, AdminJwt } from 'src/models';
 import { InjectModel } from '@nestjs/sequelize';
 import { Helpers } from 'src/utils/helpers';
-import { LoginDto } from './dto/login-dto';
+import { AdminLoginDto } from './dto/adminLogin-dto';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
     private readonly helpers: Helpers,
   ) {}
 
-  async adminLogin(loginInfo: LoginDto) {
+  async adminLogin(loginInfo: AdminLoginDto) {
     const { email, password } = loginInfo;
 
     try {

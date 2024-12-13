@@ -1,11 +1,12 @@
+import { Express } from 'express';
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
   transform(file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
-    }
+    // if (!file) {
+    //   throw new BadRequestException('No file uploaded');
+    // }
 
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (!allowedMimeTypes.includes(file.mimetype)) {

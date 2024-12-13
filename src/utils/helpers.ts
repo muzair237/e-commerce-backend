@@ -42,7 +42,7 @@ export class Helpers {
 
   generateJWTToken = (payload: { id: number; email: string }): string =>
     jwt.sign(payload, this.JWT_SECRET, {
-      expiresIn: '15d',
+      expiresIn: '2d',
       algorithm: 'HS256',
     });
 
