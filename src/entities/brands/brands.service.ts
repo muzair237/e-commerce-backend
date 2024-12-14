@@ -30,13 +30,21 @@ export class BrandsService {
 
       return this.helpers.pagination(brands, page, totalItems, itemsPerPage, getAll);
     } catch (err) {
-      throw new HttpException(`Failed to fetch brands: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.helpers.handleException(err);
     }
   }
 
   // Create a new brand
   async createBrand(brand: CreateBrandDto, logo: Express.Multer.File) {
     try {
+      const findBrand = await this.BRAND.findOne({ where: { name: brand?.name } });
+      if (findBrand) {
+        throw new HttpException(
+          { success: false, message: `Brand with the name ${brand?.name} already exists!` },
+          HttpStatus.CONFLICT,
+        );
+      }
+
       const logoUrl = await uploadFileToCloudinary(this.configService, logo);
 
       await this.BRAND.create({
@@ -49,7 +57,7 @@ export class BrandsService {
         message: 'Brand created successfully!',
       };
     } catch (err) {
-      throw new HttpException(`Failed to create brand: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      this.helpers.handleException(err);
     }
   }
 }

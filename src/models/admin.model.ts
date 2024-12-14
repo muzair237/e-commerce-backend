@@ -1,4 +1,6 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
+import { Role } from './index';
+import { AdminRole } from './junctions/admin_role.model';
 
 @Table({
   tableName: 'admins',
@@ -38,16 +40,6 @@ export class Admin extends Model<Admin> {
     },
   })
   password: string;
-
-  @Column({
-    type: DataType.ARRAY(DataType.STRING),
-    allowNull: false,
-  })
-  permissions: string[];
-
-  @Column({
-    type: DataType.ARRAY(DataType.INTEGER),
-    allowNull: false,
-  })
-  roles: number[];
+  @BelongsToMany(() => Role, () => AdminRole)
+  roles: Role[];
 }

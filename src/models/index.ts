@@ -9,4 +9,8 @@ import { Brand } from './brand.model';
 import { Product } from './product.model';
 import { ProductVariation } from './product_variation.model';
 
-export { Permission, Role, Admin, AdminJwt, Brand, Product, ProductVariation };
+// JUNCTIONS
+import { RolePermission } from './junctions/role_permission.model';
+import { AdminRole } from './junctions/admin_role.model';
+
+export { Permission, Role, Admin, AdminJwt, Brand, Product, ProductVariation, RolePermission, AdminRole };

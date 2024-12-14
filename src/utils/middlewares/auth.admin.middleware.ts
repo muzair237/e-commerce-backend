@@ -5,8 +5,8 @@ import { Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Helpers } from '../helpers';
 import { getEnvVariables } from 'src/config/configuration';
-import { Admin, AdminJwt, Role } from 'src/models';
-import { RequestInteface } from '../interfaces';
+import { Admin, AdminJwt, Role, Permission } from 'src/models';
+import { RequestInteface, AdminFormattedObject } from '../interfaces';
 
 @Injectable()
 export class AuthAdminMiddleware implements NestMiddleware {
@@ -16,6 +16,7 @@ export class AuthAdminMiddleware implements NestMiddleware {
     @InjectModel(Admin) private readonly ADMIN: typeof Admin,
     @InjectModel(AdminJwt) private readonly ADMIN_JWT: typeof AdminJwt,
     @InjectModel(Role) private readonly ROLE: typeof Role,
+    @InjectModel(Permission) private readonly PERMISSION: typeof Permission,
     private readonly configService: ConfigService,
     private readonly helpers: Helpers,
   ) {
@@ -26,13 +27,13 @@ export class AuthAdminMiddleware implements NestMiddleware {
     const authHeader: string = req.headers['authorization'];
 
     if (!authHeader) {
-      throw new HttpException({ success: false, message: 'Authorization header missing!' }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ success: false, message: 'Authorization header missing!' }, HttpStatus.NOT_FOUND);
     }
 
     const token: string = authHeader.split(' ')[1];
 
     if (!token) {
-      throw new HttpException({ success: false, message: 'Token must be non-null!' }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ success: false, message: 'Token must be non-null!' }, HttpStatus.NOT_FOUND);
     }
 
     try {
@@ -41,21 +42,28 @@ export class AuthAdminMiddleware implements NestMiddleware {
         email: string;
       };
 
-      const admin: Admin = await this.ADMIN.findByPk(decodedToken.id, {
+      const admin = await this.ADMIN.findByPk(decodedToken.id, {
         attributes: { exclude: ['password', 'created_at', 'updated_at'] },
         include: [
           {
             model: Role,
-            // attributes: ['id', 'name'],
-            // through: { attributes: [] },
+            attributes: ['type'],
+            include: [
+              {
+                model: Permission,
+                attributes: ['can'],
+                through: { attributes: [] },
+              },
+            ],
+            through: { attributes: [] },
           },
         ],
-        raw: true,
       });
-      console.log('admin: ', admin);
+
+      const formattedAdminObject: AdminFormattedObject = this.helpers.formatAdminObject(admin.toJSON());
 
       if (!admin) {
-        throw new HttpException({ success: false, message: 'Unauthorized!' }, HttpStatus.UNAUTHORIZED);
+        throw new HttpException({ success: false, message: 'Admin not found!' }, HttpStatus.NOT_FOUND);
       }
 
       const isValid: AdminJwt = await this.ADMIN_JWT.findOne({ where: { token } });
@@ -63,7 +71,7 @@ export class AuthAdminMiddleware implements NestMiddleware {
         throw new HttpException({ success: false, message: 'Kindly login again!' }, HttpStatus.UNAUTHORIZED);
       }
 
-      req.admin = admin;
+      req.admin = formattedAdminObject;
       next();
     } catch (err) {
       if (err.name === 'JsonWebTokenError') {

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PaginationResult } from './interfaces';
+import { AdminData, AdminFormattedObject, PaginationResult } from './interfaces';
 import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -61,6 +61,29 @@ export class Helpers {
     }
 
     return { iat, exp };
+  };
+
+  formatAdminObject = (adminData: AdminData): AdminFormattedObject => {
+    const roles: string[] = [];
+    const permissions: string[] = [];
+
+    adminData.roles.forEach(role => {
+      roles.push(role.type);
+
+      role.permissions.forEach(permission => {
+        if (!permissions.includes(permission.can)) {
+          permissions.push(permission.can);
+        }
+      });
+    });
+
+    return {
+      id: adminData.id,
+      name: adminData.name,
+      email: adminData.email,
+      roles,
+      permissions,
+    };
   };
 
   handleException = (err: any) => {

@@ -1,8 +1,27 @@
 import { Request } from 'express';
-import { Admin } from 'src/models';
+
+export interface AdminRole {
+  type: string;
+  permissions: { can: string }[];
+}
+
+export interface AdminData {
+  id: number;
+  name: string;
+  email: string;
+  roles: AdminRole[];
+}
+
+export interface AdminFormattedObject {
+  id: number;
+  name: string;
+  email: string;
+  roles: string[];
+  permissions: string[];
+}
 
 export interface RequestInteface extends Request {
-  admin: Admin;
+  admin: AdminFormattedObject;
 }
 
 export interface QueryParamsInterface {
