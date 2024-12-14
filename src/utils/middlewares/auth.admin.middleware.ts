@@ -5,8 +5,8 @@ import { Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { Helpers } from '../helpers';
 import { getEnvVariables } from 'src/config/configuration';
-import { Admin, AdminJwt } from 'src/models';
-import { RequestInteface } from '../types/request.interface';
+import { Admin, AdminJwt, Role } from 'src/models';
+import { RequestInteface } from '../interfaces';
 
 @Injectable()
 export class AuthAdminMiddleware implements NestMiddleware {
@@ -15,6 +15,7 @@ export class AuthAdminMiddleware implements NestMiddleware {
   constructor(
     @InjectModel(Admin) private readonly ADMIN: typeof Admin,
     @InjectModel(AdminJwt) private readonly ADMIN_JWT: typeof AdminJwt,
+    @InjectModel(Role) private readonly ROLE: typeof Role,
     private readonly configService: ConfigService,
     private readonly helpers: Helpers,
   ) {
@@ -42,8 +43,16 @@ export class AuthAdminMiddleware implements NestMiddleware {
 
       const admin: Admin = await this.ADMIN.findByPk(decodedToken.id, {
         attributes: { exclude: ['password', 'created_at', 'updated_at'] },
+        include: [
+          {
+            model: Role,
+            // attributes: ['id', 'name'],
+            // through: { attributes: [] },
+          },
+        ],
         raw: true,
       });
+      console.log('admin: ', admin);
 
       if (!admin) {
         throw new HttpException({ success: false, message: 'Unauthorized!' }, HttpStatus.UNAUTHORIZED);

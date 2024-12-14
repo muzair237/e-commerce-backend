@@ -49,4 +49,13 @@ export class AuthService {
       this.helpers.handleException(err);
     }
   }
+
+  async logoutAdmin({ id }: { id: number }) {
+    try {
+      await this.ADMIN_JWT.destroy({ where: { admin_id: id } });
+      return { success: true, message: 'Logged Out Successfully!' };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
 }

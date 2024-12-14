@@ -16,7 +16,6 @@ export class BrandsController {
     return await this.brandsService.getAllBrands(query);
   }
 
-  // Create a new brand with file validation
   @Post('create-brand')
   @UseInterceptors(FileInterceptor('logo'))
   @UsePipes(FileValidationPipe)
