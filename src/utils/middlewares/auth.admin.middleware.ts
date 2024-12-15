@@ -74,16 +74,14 @@ export class AuthAdminMiddleware implements NestMiddleware {
       req.admin = formattedAdminObject;
       next();
     } catch (err) {
-      if (err.name === 'JsonWebTokenError') {
-        await this.ADMIN_JWT.destroy({ where: { token } });
-        throw new HttpException(
-          {
-            success: false,
-            message: `${err.name}: ${err.message}`,
-          },
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
+      await this.ADMIN_JWT.destroy({ where: { token } });
+      throw new HttpException(
+        {
+          success: false,
+          message: `${err.name}: ${err.message}`,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
 
       this.helpers.handleException(err);
     }
