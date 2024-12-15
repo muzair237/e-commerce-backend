@@ -1,6 +1,5 @@
-import { Column, Model, Table, DataType, BelongsToMany } from 'sequelize-typescript';
-import { Role } from './index';
-import { AdminRole } from './junctions/admin_role.model';
+import { Column, Model, Table, DataType, BelongsToMany, HasOne } from 'sequelize-typescript';
+import { Role, AdminRole, AdminJwt } from './index';
 
 @Table({
   tableName: 'admins',
@@ -40,6 +39,10 @@ export class Admin extends Model<Admin> {
     },
   })
   password: string;
+
   @BelongsToMany(() => Role, () => AdminRole)
   roles: Role[];
+
+  @HasOne(() => AdminJwt)
+  adminJwt: AdminJwt;
 }
