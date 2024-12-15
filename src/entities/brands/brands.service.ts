@@ -15,7 +15,6 @@ export class BrandsService {
     private readonly helpers: Helpers,
   ) {}
 
-  // Fetch all brands with pagination
   async getAllBrands(query: QueryParamsInterface) {
     const { page = 1, itemsPerPage = 10, getAll } = query;
 
@@ -28,13 +27,16 @@ export class BrandsService {
         raw: true,
       });
 
-      return this.helpers.pagination(brands, page, totalItems, itemsPerPage, getAll);
+      return {
+        success: true,
+        message: 'Brands retrieved successfully',
+        data: { ...this.helpers.pagination(brands, page, totalItems, itemsPerPage, getAll) },
+      };
     } catch (err) {
       this.helpers.handleException(err);
     }
   }
 
-  // Create a new brand
   async createBrand(brand: CreateBrandDto, logo: Express.Multer.File) {
     try {
       const findBrand = await this.BRAND.findOne({ where: { name: brand?.name } });

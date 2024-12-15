@@ -40,7 +40,7 @@ export class ProductVariation extends Model<ProductVariation> {
     type: DataType.ENUM(...Object.values(RamSizes)),
     allowNull: false,
   })
-  ram: RamSizes;
+  ram: string;
 
   @Column({
     type: DataType.JSONB,

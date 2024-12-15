@@ -21,6 +21,7 @@ export class Product extends Model<Product> {
 
   @Column({
     type: DataType.STRING,
+    unique: true,
     allowNull: false,
   })
   name: string;
@@ -54,5 +55,5 @@ export class Product extends Model<Product> {
     type: DataType.ENUM(...Object.values(ScreenSizes)),
     allowNull: false,
   })
-  screenSize: ScreenSizes;
+  screenSize: string;
 }
