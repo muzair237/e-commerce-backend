@@ -86,6 +86,21 @@ export class Helpers {
     };
   };
 
+  getSorting = (sortingOrder: string, fieldName: string): [string, string][] => {
+    switch (sortingOrder) {
+      case 'asc':
+        return [[fieldName, 'ASC']];
+      case 'desc':
+        return [[fieldName, 'DESC']];
+      case 'latest':
+        return [['created_at', 'DESC']];
+      case 'earliest':
+        return [['created_at', 'ASC']];
+      default:
+        return [['created_at', 'DESC']];
+    }
+  };
+
   handleException = (err: any) => {
     if (err instanceof HttpException) {
       throw err;

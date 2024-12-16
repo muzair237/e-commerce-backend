@@ -1,11 +1,12 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
 import { Brand } from 'src/models';
 import { uploadFileToCloudinary } from 'src/utils/uploadFIle';
 import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { QueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 
 @Injectable()
 export class BrandsService {
@@ -15,11 +16,30 @@ export class BrandsService {
     private readonly helpers: Helpers,
   ) {}
 
-  async getAllBrands(query: QueryParamsInterface) {
-    const { page = 1, itemsPerPage = 10, getAll } = query;
+  async getAllBrands(queryParams: AfterQueryParamsInterface) {
+    const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort } = queryParams;
+
+    const query: any = {};
+
+    if (searchText) {
+      query.name = {
+        [Op.iLike]: `%${searchText}%`,
+      };
+    }
+
+    if (startDate && endDate) {
+      query.created_at = {
+        [Op.gte]: new Date(startDate),
+        [Op.lt]: new Date(endDate),
+      };
+    }
+
+    const sorting: [string, string][] = this.helpers.getSorting(sort, 'name');
 
     try {
       const { count: totalItems, rows: brands } = await this.BRAND.findAndCountAll({
+        where: query,
+        order: sorting,
         ...(!getAll && {
           offset: (page - 1) * itemsPerPage,
           limit: itemsPerPage,

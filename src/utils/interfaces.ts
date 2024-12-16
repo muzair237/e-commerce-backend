@@ -24,10 +24,23 @@ export interface RequestInteface extends Request {
   admin: AdminFormattedObject;
 }
 
-export interface QueryParamsInterface {
+export interface BeforeQueryParamsInterface {
+  page: string;
+  itemsPerPage: string;
+  getAll: string;
+  searchText?: string;
+  startDate?: string;
+  endDate?: string;
+  sort?: 'asc' | 'desc' | 'latest' | 'earliest';
+}
+export interface AfterQueryParamsInterface {
   page: number;
   itemsPerPage: number;
   getAll: boolean;
+  searchText?: string;
+  startDate?: Date;
+  endDate?: Date;
+  sort?: 'asc' | 'desc' | 'latest' | 'earliest';
 }
 
 export interface PaginationResult {
