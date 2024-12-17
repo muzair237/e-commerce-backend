@@ -5,11 +5,12 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Admin, AdminJwt, Brand, Permission, Role } from '../../models';
 import { Helpers } from 'src/utils/helpers';
 import { AuthAdminMiddleware } from 'src/utils/middlewares/auth.admin.middleware';
+import { CloudinaryService } from 'src/utils/uploadFIle';
 
 @Module({
   imports: [SequelizeModule.forFeature([Brand, Admin, AdminJwt, Role, Permission])],
   controllers: [BrandsController],
-  providers: [BrandsService, Helpers],
+  providers: [BrandsService, Helpers, CloudinaryService],
 })
 export class BrandsModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {

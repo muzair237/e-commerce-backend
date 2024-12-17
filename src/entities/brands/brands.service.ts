@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Brand } from 'src/models';
-import { uploadFileToCloudinary } from 'src/utils/uploadFIle';
+import { CloudinaryService } from 'src/utils/uploadFIle';
 import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -15,6 +15,7 @@ export class BrandsService {
     @InjectModel(Brand) private readonly BRAND: typeof Brand,
     private readonly configService: ConfigService,
     private readonly helpers: Helpers,
+    private readonly cloudinary: CloudinaryService,
   ) {}
 
   async getAllBrands(queryParams: AfterQueryParamsInterface) {
@@ -68,7 +69,7 @@ export class BrandsService {
         );
       }
 
-      const logoUrl = await uploadFileToCloudinary(this.configService, logo);
+      const logoUrl = await this.cloudinary.uploadFile(logo);
 
       await this.BRAND.create({
         ...brand,
@@ -87,12 +88,17 @@ export class BrandsService {
   async updateBrand(id: number, brand: UpdateBrandDto, logo: Express.Multer.File) {
     try {
       const findBrand = await this.BRAND.findByPk(id);
-
       if (!findBrand) {
         throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const logoUrl = logo ? await uploadFileToCloudinary(this.configService, logo) : findBrand.logo;
+      let logoUrl: string = findBrand.logo;
+
+      if (logo) {
+        await this.cloudinary.deleteImage(findBrand.logo);
+
+        logoUrl = await this.cloudinary.uploadFile(logo);
+      }
 
       await findBrand.update({ ...brand, logo: logoUrl });
 
