@@ -1,4 +1,15 @@
-import { Controller, Get, Post, UseInterceptors, Body, Query, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  UseInterceptors,
+  Body,
+  Query,
+  UploadedFile,
+  Put,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { Express } from 'express';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -18,7 +29,20 @@ export class BrandsController {
 
   @Post('create-brand')
   @UseInterceptors(FileInterceptor('logo'))
-  async createBrand(@Body() brand: CreateBrandDto, @UploadedFile(FileValidationPipe) logo: Express.Multer.File) {
+  async createBrand(
+    @Body() brand: CreateBrandDto,
+    @UploadedFile(new FileValidationPipe(true)) logo: Express.Multer.File,
+  ) {
     return await this.brandsService.createBrand(brand, logo);
+  }
+
+  @Put('update-brand/:id')
+  @UseInterceptors(FileInterceptor('logo'))
+  async updateBrand(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() brand: CreateBrandDto,
+    @UploadedFile(new FileValidationPipe(false)) logo: Express.Multer.File,
+  ) {
+    return await this.brandsService.updateBrand(id, brand, logo);
   }
 }

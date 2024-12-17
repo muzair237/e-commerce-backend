@@ -6,6 +6,7 @@ import { uploadFileToCloudinary } from 'src/utils/uploadFIle';
 import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 
 @Injectable()
@@ -78,6 +79,24 @@ export class BrandsService {
         success: true,
         message: 'Brand created successfully!',
       };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
+  async updateBrand(id: number, brand: UpdateBrandDto, logo: Express.Multer.File) {
+    try {
+      const findBrand = await this.BRAND.findByPk(id);
+
+      if (!findBrand) {
+        throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const logoUrl = logo ? await uploadFileToCloudinary(this.configService, logo) : findBrand.logo;
+
+      await findBrand.update({ ...brand, logo: logoUrl });
+
+      return { success: true, message: 'Brand updated successfully' };
     } catch (err) {
       this.helpers.handleException(err);
     }

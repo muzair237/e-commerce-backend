@@ -75,13 +75,6 @@ export class AuthAdminMiddleware implements NestMiddleware {
       next();
     } catch (err) {
       await this.ADMIN_JWT.destroy({ where: { token } });
-      throw new HttpException(
-        {
-          success: false,
-          message: `${err.name}: ${err.message}`,
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
 
       this.helpers.handleException(err);
     }
