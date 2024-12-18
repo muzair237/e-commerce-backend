@@ -18,7 +18,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(helmet());
   app.use(morgan(':date[iso] - :method - :url - :status - :response-time ms'));
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   await app.listen(port, () => console.log(`Server started on port ${port}`));
 }

@@ -1,22 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  UseInterceptors,
-  Body,
-  Query,
-  UploadedFile,
-  Put,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common';
-import { Express } from 'express';
+import { Controller, Get, Post, Body, Query, Put, Param, ParseIntPipe } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 import { QueryParamsValidationPipe } from 'src/utils/pipes/queryParams.pipe';
-import { FileValidationPipe } from 'src/utils/pipes/file.pipe';
+import { FormDataRequest } from 'nestjs-form-data';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Controller('brands')
 export class BrandsController {
@@ -28,21 +16,14 @@ export class BrandsController {
   }
 
   @Post('create-brand')
-  @UseInterceptors(FileInterceptor('logo'))
-  async createBrand(
-    @Body() brand: CreateBrandDto,
-    @UploadedFile(new FileValidationPipe(true)) logo: Express.Multer.File,
-  ) {
-    return await this.brandsService.createBrand(brand, logo);
+  @FormDataRequest()
+  async createBrand(@Body() brand: CreateBrandDto) {
+    return await this.brandsService.createBrand(brand);
   }
 
   @Put('update-brand/:id')
-  @UseInterceptors(FileInterceptor('logo'))
-  async updateBrand(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() brand: CreateBrandDto,
-    @UploadedFile(new FileValidationPipe(false)) logo: Express.Multer.File,
-  ) {
-    return await this.brandsService.updateBrand(id, brand, logo);
+  @FormDataRequest()
+  async updateBrand(@Param('id', ParseIntPipe) id: number, @Body() brand: UpdateBrandDto) {
+    return await this.brandsService.updateBrand(id, brand);
   }
 }

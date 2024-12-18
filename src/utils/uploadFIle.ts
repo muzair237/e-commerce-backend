@@ -1,8 +1,8 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
-import { Express } from 'express';
 import { cloudinaryConfig } from '../config/cloudinary.config';
+import { MemoryStoredFile } from 'nestjs-form-data';
 
 @Injectable()
 export class CloudinaryService {
@@ -16,7 +16,7 @@ export class CloudinaryService {
    * @param file - The file object from Multer
    * @returns Secure URL of uploaded image
    */
-  async uploadFile(file: Express.Multer.File): Promise<string> {
+  async uploadFile(file: MemoryStoredFile): Promise<string> {
     try {
       const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${file.buffer.toString('base64')}`);
       return result.secure_url;

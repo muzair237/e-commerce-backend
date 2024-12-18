@@ -59,12 +59,14 @@ export class BrandsService {
     }
   }
 
-  async createBrand(brand: CreateBrandDto, logo: Express.Multer.File) {
+  async createBrand(brand: CreateBrandDto) {
     try {
-      const findBrand = await this.BRAND.findOne({ where: { name: brand?.name } });
+      const { name, logo } = brand;
+
+      const findBrand = await this.BRAND.findOne({ where: { name } });
       if (findBrand) {
         throw new HttpException(
-          { success: false, message: `Brand with the name ${brand?.name} already exists!` },
+          { success: false, message: `Brand with the name ${name} already exists!` },
           HttpStatus.CONFLICT,
         );
       }
@@ -85,8 +87,9 @@ export class BrandsService {
     }
   }
 
-  async updateBrand(id: number, brand: UpdateBrandDto, logo: Express.Multer.File) {
+  async updateBrand(id: number, brand: UpdateBrandDto) {
     try {
+      const { logo } = brand;
       const findBrand = await this.BRAND.findByPk(id);
       if (!findBrand) {
         throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
