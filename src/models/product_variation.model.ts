@@ -57,8 +57,8 @@ export class ProductVariation extends Model<ProductVariation> {
   })
   graphicsCard: {
     isGraphicsCard: boolean;
-    type: GraphicsCardTypes;
-    memory: GraphicsCardMemorySizes;
+    type?: GraphicsCardTypes;
+    memory?: GraphicsCardMemorySizes;
   };
 
   @Column({

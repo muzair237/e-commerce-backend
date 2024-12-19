@@ -17,11 +17,16 @@ export class ProductsController {
   @Post('create-product')
   @FormDataRequest()
   async createProduct(@Body() productData: CreateProductDto) {
-    console.log('productData: ', productData);
+    return await this.productsService.createProduct(productData);
   }
 
   @Get('get-product-variations/:id')
   async getProductVariations(@Param('id', ParseIntPipe) id: number) {
     return await this.productsService.getProductVariations(id);
+  }
+
+  @Get('get-product-filter-options')
+  async getProductFiltersOptions() {
+    return await this.productsService.getProductFiltersOptions();
   }
 }

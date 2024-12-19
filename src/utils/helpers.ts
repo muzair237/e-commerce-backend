@@ -1,4 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
+import { Brand } from 'src/models';
 import { AdminData, AdminFormattedObject, PaginationResult } from './interfaces';
 import * as bcryptjs from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
@@ -9,7 +12,10 @@ import { jwtDecode, JwtPayload } from 'jwt-decode';
 @Injectable()
 export class Helpers {
   private readonly JWT_SECRET: string;
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    @InjectModel(Brand) private readonly BRAND: typeof Brand,
+    private readonly configService: ConfigService,
+  ) {
     ({ JWT_SECRET: this.JWT_SECRET } = getEnvVariables(configService));
   }
 
@@ -99,6 +105,17 @@ export class Helpers {
       default:
         return [['created_at', 'DESC']];
     }
+  };
+
+  getBrandsById = async (query: string): Promise<number[]> => {
+    const brandSearchQuery = {
+      name: {
+        [Op.iLike]: `%${query}%`,
+      },
+    };
+
+    const brands = await this.BRAND.findAll({ where: brandSearchQuery });
+    return brands.map(e => e.id);
   };
 
   handleException = (err: any) => {

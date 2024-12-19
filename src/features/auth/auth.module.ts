@@ -2,12 +2,12 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Admin, AdminJwt, Role, Permission } from 'src/models';
+import { Admin, AdminJwt, Role, Permission, Brand } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
 import { AuthAdminMiddleware } from 'src/utils/middlewares/auth.admin.middleware';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Admin, AdminJwt, Role, Permission])],
+  imports: [SequelizeModule.forFeature([Brand, Admin, AdminJwt, Role, Permission])],
   controllers: [AuthController],
   providers: [AuthService, Helpers],
 })

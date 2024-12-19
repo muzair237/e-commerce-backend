@@ -7,6 +7,7 @@ import {
   IsEnum,
   IsBoolean,
   IsObject,
+  ValidateIf,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import {
@@ -42,14 +43,15 @@ class ProcessorDto {
 
 class GraphicsCardDto {
   @IsBoolean()
-  @IsNotEmpty()
   @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : Boolean(value)))
   isGraphicsCard: boolean;
 
+  @ValidateIf(obj => obj.isGraphicsCard === true)
   @IsEnum(GraphicsCardTypes)
   @IsOptional()
   type?: GraphicsCardTypes;
 
+  @ValidateIf(obj => obj.isGraphicsCard === true)
   @IsEnum(GraphicsCardMemorySizes)
   @IsOptional()
   memory?: GraphicsCardMemorySizes;

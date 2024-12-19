@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Admin, AdminJwt, Brand, Permission, Role } from '../../models';
 import { Helpers } from 'src/utils/helpers';
 import { AuthAdminMiddleware } from 'src/utils/middlewares/auth.admin.middleware';
-import { CloudinaryService } from 'src/utils/uploadFIle';
+import { CloudinaryService } from 'src/utils/uploadFiles';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({

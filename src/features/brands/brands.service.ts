@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Brand } from 'src/models';
-import { CloudinaryService } from 'src/utils/uploadFIle';
+import { CloudinaryService } from 'src/utils/uploadFiles';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -69,7 +69,7 @@ export class BrandsService {
         );
       }
 
-      const logoUrl = await this.cloudinary.uploadFile(logo);
+      const logoUrl = await this.cloudinary.uploadSingleFile(logo);
 
       await this.BRAND.create({
         ...brand,
@@ -98,7 +98,7 @@ export class BrandsService {
       if (logo) {
         await this.cloudinary.deleteImage(findBrand.logo);
 
-        logoUrl = await this.cloudinary.uploadFile(logo);
+        logoUrl = await this.cloudinary.uploadSingleFile(logo);
       }
 
       await findBrand.update({ ...brand, logo: logoUrl });

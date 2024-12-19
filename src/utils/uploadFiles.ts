@@ -12,16 +12,36 @@ export class CloudinaryService {
   }
 
   /**
-   * Upload file to Cloudinary
+   * Upload single file to Cloudinary
    * @param file - The file object from Multer
-   * @returns Secure URL of uploaded image
+   * @returns Secure URL of uploaded file
    */
-  async uploadFile(file: MemoryStoredFile): Promise<string> {
+  async uploadSingleFile(file: MemoryStoredFile): Promise<string> {
     try {
       const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${file.buffer.toString('base64')}`);
       return result.secure_url;
     } catch (error) {
-      throw new HttpException(`Error in uploading image: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Error in uploading file: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Upload multiple files to Cloudinary
+   * @param files - The files array from Multer
+   * @returns Secure array of URL of uploaded file
+   */
+  async uploadMultipleImages(files: MemoryStoredFile[]): Promise<string[] | []> {
+    try {
+      if (files.length === 0) {
+        return [];
+      }
+
+      const uploadPromises = files.map(image => this.uploadSingleFile(image));
+      const uploadedFiles = await Promise.all(uploadPromises);
+
+      return uploadedFiles.filter((url: string) => url !== '');
+    } catch (error) {
+      throw new HttpException(`Error in uploading files: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
