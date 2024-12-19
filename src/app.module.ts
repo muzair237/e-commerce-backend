@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { databaseConfig } from './config/database.config';
-import { EntitiesModule } from './entities/entities.module';
+import { FeaturesModule } from './features/features.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
@@ -17,7 +17,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => databaseConfig(configService),
     }),
-    EntitiesModule,
+    FeaturesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

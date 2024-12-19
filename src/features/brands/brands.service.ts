@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Brand } from 'src/models';
 import { CloudinaryService } from 'src/utils/uploadFIle';
-import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -13,7 +12,6 @@ import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 export class BrandsService {
   constructor(
     @InjectModel(Brand) private readonly BRAND: typeof Brand,
-    private readonly configService: ConfigService,
     private readonly helpers: Helpers,
     private readonly cloudinary: CloudinaryService,
   ) {}

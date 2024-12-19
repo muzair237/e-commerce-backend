@@ -44,6 +44,7 @@ module.exports = {
     'space-unary-ops': 'error',
     quotes: ['error', 'single'],
     'max-len': ['error', { code: 200 }],
+    "prefer-destructuring": ["error", { "object": true, "array": true }],
     'max-lines': ['error', { max: 500 }],
     'keyword-spacing': 'error',
     'multiline-ternary': ['error', 'never'],

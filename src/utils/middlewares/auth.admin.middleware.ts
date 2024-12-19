@@ -30,6 +30,7 @@ export class AuthAdminMiddleware implements NestMiddleware {
       throw new HttpException({ success: false, message: 'Authorization header missing!' }, HttpStatus.NOT_FOUND);
     }
 
+    // eslint-disable-next-line prefer-destructuring
     const token: string = authHeader.split(' ')[1];
 
     if (!token) {

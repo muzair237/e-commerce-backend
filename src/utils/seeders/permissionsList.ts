@@ -11,4 +11,10 @@ export const permissionsList = [
     description: 'Can view the manage brands page',
     parent: ['$'],
   },
+  {
+    route: '/manage-products',
+    can: 'manage-products.nav',
+    description: 'Can view the manage products page',
+    parent: ['$'],
+  },
 ];

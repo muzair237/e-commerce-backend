@@ -4,10 +4,10 @@ import { BrandsModule } from './brands/brands.module';
 import { ProductsModule } from './products/products.module';
 import { SeederModule } from './seeder/seeder.module';
 
-const entitiesModules = [AuthModule, BrandsModule, ProductsModule, SeederModule];
+const featuresModules = [AuthModule, BrandsModule, ProductsModule, SeederModule];
 
 @Module({
-  imports: entitiesModules,
-  exports: entitiesModules,
+  imports: featuresModules,
+  exports: featuresModules,
 })
-export class EntitiesModule {}
+export class FeaturesModule {}
