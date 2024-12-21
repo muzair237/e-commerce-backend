@@ -21,7 +21,7 @@ import {
 } from 'src/utils/enums';
 import { ProductDto } from './product.dto';
 
-class StorageDto {
+export class StorageDto {
   @IsEnum(StorageTypes)
   @IsNotEmpty()
   type: StorageTypes;
@@ -31,7 +31,7 @@ class StorageDto {
   size: StorageSizes;
 }
 
-class ProcessorDto {
+export class ProcessorDto {
   @IsEnum(ProcessorNames)
   @IsNotEmpty()
   name: ProcessorNames;
@@ -41,7 +41,7 @@ class ProcessorDto {
   generation: ProcessorGenerations;
 }
 
-class GraphicsCardDto {
+export class GraphicsCardDto {
   @IsBoolean()
   @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : Boolean(value)))
   isGraphicsCard: boolean;
@@ -57,7 +57,11 @@ class GraphicsCardDto {
   memory?: GraphicsCardMemorySizes;
 }
 
-class ProductVariationDto {
+export class ProductVariationDto {
+  @IsOptional()
+  @IsNumber()
+  productId: number;
+
   @IsNotEmpty()
   @ValidateNested()
   @Type(() => StorageDto)

@@ -87,3 +87,10 @@ export enum GraphicsCardMemorySizes {
   GB_12 = '12GB',
   GB_16 = '16GB',
 }
+
+export enum SortEnums {
+  ASC = 'asc',
+  DESC = 'desc',
+  LATEST = 'latest',
+  EARLIEST = 'earliest',
+}

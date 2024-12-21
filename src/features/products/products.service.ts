@@ -5,7 +5,7 @@ import { Op, Transaction } from 'sequelize';
 import { Brand, Product, ProductVariation } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, ProductVariationDto } from './dto/create-product.dto';
 import { CloudinaryService } from 'src/utils/uploadFiles';
 import { MemoryStoredFile } from 'nestjs-form-data';
 import {
@@ -17,6 +17,7 @@ import {
   StorageSizes,
   StorageTypes,
 } from 'src/utils/enums';
+import { ProductsAdvancedSearchDTO } from './dto/products-advanced-search.dto';
 
 @Injectable()
 export class ProductsService {
@@ -68,7 +69,15 @@ export class ProductsService {
       const { count: totalItems, rows: products } = await this.PRODUCT.findAndCountAll({
         where: query,
         attributes: {
-          include: [[Sequelize.col('brand.name'), 'brandName']],
+          include: [
+            [Sequelize.col('brand.name'), 'brandName'],
+            [
+              Sequelize.literal(
+                '(SELECT COUNT(*) FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id")',
+              ),
+              'noOfVariants',
+            ],
+          ],
         },
         include: [
           {
@@ -90,6 +99,103 @@ export class ProductsService {
         success: true,
         message: 'Products retrieved successfully',
         data: { ...this.helpers.pagination(products, page, totalItems, itemsPerPage, getAll) },
+      };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
+  async advancedProductSearch(advancedSearchFilters: ProductsAdvancedSearchDTO) {
+    try {
+      const { page = 1, itemsPerPage = 5, getAll = false } = advancedSearchFilters;
+
+      const {
+        searchText,
+        brand,
+        ram,
+        storageType,
+        storageSize,
+        processorName,
+        processorGeneration,
+        graphicsCardType,
+        graphicsCardMemorySize,
+        minPrice,
+        maxPrice,
+        sort,
+      } = advancedSearchFilters;
+
+      const productQuery: any = {};
+      const variationQuery: any = {};
+
+      if (searchText) {
+        productQuery[Op.or] = [
+          { name: { [Op.iLike]: `%${searchText}%` } },
+          { model: { [Op.iLike]: `%${searchText}%` } },
+          { description: { [Op.iLike]: `%${searchText}%` } },
+          {
+            brandId: {
+              [Op.in]: await this.helpers.getBrandsById(searchText),
+            },
+          },
+        ];
+      }
+      if (brand) productQuery.brandId = brand;
+
+      if (ram) variationQuery.ram = ram;
+      if (storageType) variationQuery['storage.type'] = storageType;
+      if (storageSize) variationQuery['storage.size'] = storageSize;
+      if (processorName) variationQuery['processor.name'] = processorName;
+      if (processorGeneration) variationQuery['processor.generation'] = processorGeneration;
+      if (graphicsCardType) variationQuery['graphicsCard.type'] = graphicsCardType;
+      if (graphicsCardMemorySize) variationQuery['graphicsCard.memory'] = graphicsCardMemorySize;
+
+      if (minPrice || maxPrice) {
+        variationQuery.price = {};
+        if (minPrice) variationQuery.price[Op.gte] = minPrice;
+        if (maxPrice) variationQuery.price[Op.lte] = maxPrice;
+      }
+
+      const sorting: [string, string][] = this.helpers.getSorting(sort, 'model');
+
+      const { count: totalItems, rows: products } = await this.PRODUCT.findAndCountAll({
+        where: productQuery,
+        attributes: {
+          exclude: ['brandId', 'updated_at'],
+          include: [
+            [
+              Sequelize.literal(
+                '(SELECT COUNT(*) FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id")',
+              ),
+              'noOfVariants',
+            ],
+          ],
+        },
+        include: [
+          {
+            model: ProductVariation,
+            as: 'variations',
+            where: variationQuery,
+            attributes: [],
+            required: true,
+          },
+          {
+            model: Brand,
+            as: 'brand',
+            attributes: ['name'],
+            required: false,
+          },
+        ],
+        order: sorting,
+        ...(!getAll && {
+          offset: (page - 1) * itemsPerPage,
+          limit: itemsPerPage,
+        }),
+      });
+
+      return {
+        success: true,
+        message: 'Advanced search products retrieved successfully',
+        data: this.helpers.pagination(products, page, totalItems, itemsPerPage, getAll),
       };
     } catch (err) {
       this.helpers.handleException(err);
@@ -142,6 +248,76 @@ export class ProductsService {
     }
   }
 
+  async createProductVariant(productId: number, productVariantData: ProductVariationDto) {
+    try {
+      const findProduct = await this.PRODUCT.findByPk(productId);
+      if (!findProduct) {
+        throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const existingVariant = await this.PRODUCT_VARIATION.findOne({
+        where: {
+          productId,
+          storage: productVariantData.storage,
+          ram: productVariantData.ram,
+          processor: productVariantData.processor,
+          graphicsCard: productVariantData.graphicsCard,
+        },
+      });
+
+      if (existingVariant) {
+        throw new HttpException(
+          { success: false, message: 'Variant with the same values already exists for this product!' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.PRODUCT_VARIATION.create({ productId, ...productVariantData });
+
+      return {
+        success: true,
+        message: 'Product variant created successfully',
+      };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
+  async updateProductVariant(variantId: number, productVariantData: ProductVariationDto) {
+    try {
+      const findVariant = await this.PRODUCT_VARIATION.findByPk(variantId);
+      if (!findVariant) {
+        throw new HttpException({ success: false, message: 'Product variant not found!' }, HttpStatus.NOT_FOUND);
+      }
+      const existingVariant = await this.PRODUCT_VARIATION.findOne({
+        where: {
+          id: { [Op.ne]: variantId },
+          productId: findVariant?.productId,
+          storage: productVariantData.storage,
+          ram: productVariantData.ram,
+          processor: productVariantData.processor,
+          graphicsCard: productVariantData.graphicsCard,
+        },
+      });
+
+      if (existingVariant) {
+        throw new HttpException(
+          { success: false, message: 'Variant with the same values already exists for this product!' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.PRODUCT_VARIATION.update(productVariantData, { where: { id: variantId } });
+
+      return {
+        success: true,
+        message: 'Product variant updated successfully',
+      };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
   async getProductVariations(id: number) {
     try {
       const findProduct: Product = await this.PRODUCT.findByPk(id);
@@ -149,10 +325,14 @@ export class ProductsService {
         throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const productVariations = await this.PRODUCT_VARIATION.findAll({ where: { productId: id } });
+      const productVariations = await this.PRODUCT_VARIATION.findAll({
+        where: { productId: id },
+        order: [['created_at', 'ASC']],
+      });
+
       return {
         success: true,
-        message: 'Product Variations retrieved successfully',
+        message: 'Product variations retrieved successfully',
         data: productVariations,
       };
     } catch (err) {
