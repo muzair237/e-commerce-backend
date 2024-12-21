@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsString, IsEnum, IsNumber, IsBoolean, IsNotEmpty, IsOptional } from 'class-validator';
 import {
   GraphicsCardMemorySizes,
@@ -13,6 +14,7 @@ import {
 export class ProductsAdvancedSearchDTO {
   @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => (typeof value === 'string' ? parseInt(value) : typeof value === 'number' && value))
   page: number;
 
   @IsNumber()
@@ -24,7 +26,8 @@ export class ProductsAdvancedSearchDTO {
   getAll: boolean;
 
   @IsString()
-  searchText: string;
+  @IsOptional()
+  searchText?: string;
 
   @IsNumber()
   @IsOptional()

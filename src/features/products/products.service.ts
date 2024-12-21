@@ -107,7 +107,7 @@ export class ProductsService {
 
   async advancedProductSearch(advancedSearchFilters: ProductsAdvancedSearchDTO) {
     try {
-      const { page = 1, itemsPerPage = 5, getAll = false } = advancedSearchFilters;
+      const { page, itemsPerPage, getAll } = advancedSearchFilters;
 
       const {
         searchText,
@@ -186,6 +186,7 @@ export class ProductsService {
           },
         ],
         order: sorting,
+        distinct: true,
         ...(!getAll && {
           offset: (page - 1) * itemsPerPage,
           limit: itemsPerPage,
