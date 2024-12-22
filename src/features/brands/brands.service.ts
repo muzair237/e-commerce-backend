@@ -23,7 +23,7 @@ export class BrandsService {
 
     if (searchText) {
       query.name = {
-        [Op.iLike]: `%${searchText}%`,
+        [Op.iLike]: `%${searchText.trim()}%`,
       };
     }
 

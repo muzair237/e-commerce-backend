@@ -94,8 +94,9 @@ export class CreateProductDto {
   @ValidateNested()
   product: ProductDto;
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProductVariationDto)
-  variations: ProductVariationDto[];
+  variations?: ProductVariationDto[];
 }

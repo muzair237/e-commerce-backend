@@ -14,6 +14,7 @@ import {
   ProcessorGenerations,
   ProcessorNames,
   RamSizes,
+  ScreenSizes,
   StorageSizes,
   StorageTypes,
 } from 'src/utils/enums';
@@ -41,17 +42,17 @@ export class ProductsService {
           [Op.or]: [
             {
               model: {
-                [Op.iLike]: `%${searchText}%`,
+                [Op.iLike]: `%${searchText.trim()}%`,
               },
             },
             {
               description: {
-                [Op.iLike]: `%${searchText}%`,
+                [Op.iLike]: `%${searchText.trim()}%`,
               },
             },
             {
               brandId: {
-                [Op.in]: await this.helpers.getBrandsById(searchText),
+                [Op.in]: await this.helpers.getBrandsById(searchText.trim()),
               },
             },
           ],
@@ -350,6 +351,7 @@ export class ProductsService {
         message: 'Product filters options retrieved successfully',
         data: {
           brandOptions: brands,
+          screenSizes: ScreenSizes,
           ramOptions: RamSizes,
           storageTypeOptions: StorageTypes,
           storageSizeOptions: StorageSizes,
