@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { QueryParamsValidationPipe } from 'src/utils/pipes/queryParams.pipe';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 import { CreateProductDto, ProductVariationDto } from './dto/create-product.dto';
 import { FormDataRequest } from 'nestjs-form-data';
 import { ProductsAdvancedSearchDTO } from './dto/products-advanced-search.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -27,6 +28,12 @@ export class ProductsController {
     return await this.productsService.createProduct(productData);
   }
 
+  @Put('update-product/:id')
+  @FormDataRequest()
+  async updateProduct(@Param('id', ParseIntPipe) id: number, @Body() productData: UpdateProductDto) {
+    return await this.productsService.updateProduct(id, productData);
+  }
+
   @Post('create-product-variant/:id')
   async createProductVariant(
     @Param('id', ParseIntPipe) productId: number,
@@ -41,6 +48,11 @@ export class ProductsController {
     @Body() productVariantData: ProductVariationDto,
   ) {
     return await this.productsService.updateProductVariant(variantId, productVariantData);
+  }
+
+  @Delete('delete-product-variant/:id')
+  async deleteProductVariant(@Param('id', ParseIntPipe) id: number) {
+    return await this.productsService.deleteProductVariant(id);
   }
 
   @Get('get-product-variants/:id')

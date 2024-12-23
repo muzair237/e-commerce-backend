@@ -62,6 +62,34 @@ export class CloudinaryService {
   }
 
   /**
+   * Replace images - Upload new images, retain unchanged ones, and delete removed ones
+   * @param existingImages - Current image URLs
+   * @param newImages - Updated image data (URLs or files)
+   * @returns Updated image URLs
+   */
+  async handleImageUpdates(existingImages: string[], newImages: (string | MemoryStoredFile)[]): Promise<string[]> {
+    const updatedImages: string[] = [];
+
+    for (const element of newImages) {
+      const image = element;
+
+      if (typeof image === 'string') {
+        updatedImages.push(image);
+      } else if (image instanceof MemoryStoredFile) {
+        const uploadedUrl = await this.uploadSingleFile(image);
+        updatedImages.push(uploadedUrl);
+      }
+    }
+
+    const imagesToDelete = existingImages.filter(url => !updatedImages.includes(url));
+    for (const url of imagesToDelete) {
+      await this.deleteImage(url);
+    }
+
+    return updatedImages;
+  }
+
+  /**
    * Extract public ID from Cloudinary URL
    * @param url - Full Cloudinary URL of the image
    * @returns Public ID of the image

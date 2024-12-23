@@ -19,6 +19,7 @@ import {
   StorageTypes,
 } from 'src/utils/enums';
 import { ProductsAdvancedSearchDTO } from './dto/products-advanced-search.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -250,6 +251,33 @@ export class ProductsService {
     }
   }
 
+  async updateProduct(id: number, productData: UpdateProductDto) {
+    try {
+      const { name, model, description, brandId, images, screenSize } = productData;
+
+      const findProduct = await this.PRODUCT.findByPk(id);
+      if (!findProduct) {
+        throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const findBrand = await this.BRAND.findByPk(brandId);
+      if (!findBrand) {
+        throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const updatedImages = await this.cloudinary.handleImageUpdates(findProduct.images, images || findProduct.images);
+
+      await this.PRODUCT.update(
+        { name, model, description, brandId, images: updatedImages, screenSize },
+        { where: { id } },
+      );
+
+      return { success: true, message: 'Product updated successfully!' };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
   async createProductVariant(productId: number, productVariantData: ProductVariationDto) {
     try {
       const findProduct = await this.PRODUCT.findByPk(productId);
@@ -314,6 +342,24 @@ export class ProductsService {
       return {
         success: true,
         message: 'Product variant updated successfully',
+      };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
+  async deleteProductVariant(id: number) {
+    try {
+      const findVariant = await this.PRODUCT_VARIATION.findByPk(id);
+      if (!findVariant) {
+        throw new HttpException({ success: false, message: 'Product variant not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      await this.PRODUCT_VARIATION.destroy({ where: { id } });
+
+      return {
+        success: true,
+        message: 'Product variant deleted successfully',
       };
     } catch (err) {
       this.helpers.handleException(err);
