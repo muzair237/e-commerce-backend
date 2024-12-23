@@ -162,7 +162,7 @@ export class ProductsService {
       const { count: totalItems, rows: products } = await this.PRODUCT.findAndCountAll({
         where: productQuery,
         attributes: {
-          exclude: ['brandId', 'updated_at'],
+          exclude: ['updated_at'],
           include: [
             [
               Sequelize.literal(
