@@ -62,8 +62,21 @@ export class ProductVariation extends Model<ProductVariation> {
   };
 
   @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  quantity: number;
+
+  @Column({
     type: DataType.DECIMAL(10, 2),
     allowNull: false,
   })
-  price: number;
+  costPrice: number;
+
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+    allowNull: false,
+  })
+  salePrice: number;
 }

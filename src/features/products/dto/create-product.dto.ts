@@ -82,9 +82,19 @@ export class ProductVariationDto {
   graphicsCard: GraphicsCardDto;
 
   @IsNumber()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : 0))
+  @IsOptional()
+  quantity?: number = 0;
+
+  @IsNumber()
   @Transform(({ value }) => Number(value))
   @IsNotEmpty()
-  price: number;
+  costPrice: number;
+
+  @IsNumber()
+  @Transform(({ value }) => Number(value))
+  @IsNotEmpty()
+  salePrice: number;
 }
 
 export class CreateProductDto {

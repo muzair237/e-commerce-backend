@@ -38,7 +38,7 @@ export class ProductsService {
 
       let query: any = {};
 
-      if (searchText) {
+      if (searchText && searchText.trim() !== '') {
         query = {
           [Op.or]: [
             {
@@ -73,6 +73,12 @@ export class ProductsService {
         attributes: {
           include: [
             [Sequelize.col('brand.name'), 'brandName'],
+            [
+              Sequelize.literal(
+                'COALESCE((SELECT SUM("quantity") FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id"), 0)',
+              ),
+              'totalQuantity',
+            ],
             [
               Sequelize.literal(
                 '(SELECT COUNT(*) FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id")',
@@ -110,7 +116,6 @@ export class ProductsService {
   async advancedProductSearch(advancedSearchFilters: ProductsAdvancedSearchDTO) {
     try {
       const { page, itemsPerPage, getAll } = advancedSearchFilters;
-
       const {
         searchText,
         brand,
@@ -129,14 +134,14 @@ export class ProductsService {
       const productQuery: any = {};
       const variationQuery: any = {};
 
-      if (searchText) {
+      if (searchText && searchText.trim() !== '') {
         productQuery[Op.or] = [
-          { name: { [Op.iLike]: `%${searchText}%` } },
-          { model: { [Op.iLike]: `%${searchText}%` } },
-          { description: { [Op.iLike]: `%${searchText}%` } },
+          { name: { [Op.iLike]: `%${searchText.trim()}%` } },
+          { model: { [Op.iLike]: `%${searchText.trim()}%` } },
+          { description: { [Op.iLike]: `%${searchText.trim()}%` } },
           {
             brandId: {
-              [Op.in]: await this.helpers.getBrandsById(searchText),
+              [Op.in]: await this.helpers.getBrandsById(searchText.trim()),
             },
           },
         ];
@@ -152,9 +157,9 @@ export class ProductsService {
       if (graphicsCardMemorySize) variationQuery['graphicsCard.memory'] = graphicsCardMemorySize;
 
       if (minPrice || maxPrice) {
-        variationQuery.price = {};
-        if (minPrice) variationQuery.price[Op.gte] = minPrice;
-        if (maxPrice) variationQuery.price[Op.lte] = maxPrice;
+        variationQuery.salePrice = {};
+        if (minPrice) variationQuery.salePrice[Op.gte] = minPrice;
+        if (maxPrice) variationQuery.salePrice[Op.lte] = maxPrice;
       }
 
       const sorting: [string, string][] = this.helpers.getSorting(sort, 'model');
@@ -162,13 +167,18 @@ export class ProductsService {
       const { count: totalItems, rows: products } = await this.PRODUCT.findAndCountAll({
         where: productQuery,
         attributes: {
-          exclude: ['updated_at'],
           include: [
             [
               Sequelize.literal(
                 '(SELECT COUNT(*) FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id")',
               ),
               'noOfVariants',
+            ],
+            [
+              Sequelize.literal(
+                'COALESCE((SELECT SUM("quantity") FROM "product_variations" WHERE "product_variations"."productId" = "Product"."id"), 0)',
+              ),
+              'totalQuantity',
             ],
           ],
         },
@@ -178,7 +188,7 @@ export class ProductsService {
             as: 'variations',
             where: variationQuery,
             attributes: [],
-            required: true,
+            required: false,
           },
           {
             model: Brand,
