@@ -38,22 +38,22 @@ export class ProductsService {
 
       let query: any = {};
 
-      if (searchText && searchText.trim() !== '') {
+      if (searchText) {
         query = {
           [Op.or]: [
             {
               model: {
-                [Op.iLike]: `%${searchText.trim()}%`,
+                [Op.iLike]: `%${searchText}%`,
               },
             },
             {
               description: {
-                [Op.iLike]: `%${searchText.trim()}%`,
+                [Op.iLike]: `%${searchText}%`,
               },
             },
             {
               brandId: {
-                [Op.in]: await this.helpers.getBrandsById(searchText.trim()),
+                [Op.in]: await this.helpers.getBrandsById(searchText),
               },
             },
           ],
@@ -134,14 +134,14 @@ export class ProductsService {
       const productQuery: any = {};
       const variationQuery: any = {};
 
-      if (searchText && searchText.trim() !== '') {
+      if (searchText) {
         productQuery[Op.or] = [
-          { name: { [Op.iLike]: `%${searchText.trim()}%` } },
-          { model: { [Op.iLike]: `%${searchText.trim()}%` } },
-          { description: { [Op.iLike]: `%${searchText.trim()}%` } },
+          { name: { [Op.iLike]: `%${searchText}%` } },
+          { model: { [Op.iLike]: `%${searchText}%` } },
+          { description: { [Op.iLike]: `%${searchText}%` } },
           {
             brandId: {
-              [Op.in]: await this.helpers.getBrandsById(searchText.trim()),
+              [Op.in]: await this.helpers.getBrandsById(searchText),
             },
           },
         ];
@@ -268,6 +268,21 @@ export class ProductsService {
       const findProduct = await this.PRODUCT.findByPk(id);
       if (!findProduct) {
         throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const isProductExists: Product = await this.PRODUCT.findOne({
+        where: {
+          name,
+          id: {
+            [Op.ne]: id,
+          },
+        },
+      });
+      if (isProductExists) {
+        throw new HttpException(
+          { success: false, message: `Product with the name '${findProduct?.name}' already exists!` },
+          HttpStatus.CONFLICT,
+        );
       }
 
       const findBrand = await this.BRAND.findByPk(brandId);

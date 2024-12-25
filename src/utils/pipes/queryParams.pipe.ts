@@ -26,7 +26,7 @@ export class QueryParamsValidationPipe implements PipeTransform {
       page: Number(page) || 1,
       itemsPerPage: Number(itemsPerPage) || 10,
       getAll: getAll === 'false' ? false : Boolean(getAll),
-      searchText,
+      searchText: searchText?.trim(),
       startDate: startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : null,
       endDate: endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null,
       sort: sort || 'desc',

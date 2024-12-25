@@ -23,7 +23,7 @@ export class BrandsService {
 
     if (searchText) {
       query.name = {
-        [Op.iLike]: `%${searchText.trim()}%`,
+        [Op.iLike]: `%${searchText}%`,
       };
     }
 
@@ -91,6 +91,22 @@ export class BrandsService {
       const findBrand = await this.BRAND.findByPk(id);
       if (!findBrand) {
         throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const isBrandExists = await this.BRAND.findOne({
+        where: {
+          name: brand?.name,
+          id: {
+            [Op.ne]: id,
+          },
+        },
+      });
+
+      if (isBrandExists) {
+        throw new HttpException(
+          { success: false, message: `Brand with the name ${brand?.name} already exists!` },
+          HttpStatus.CONFLICT,
+        );
       }
 
       let logoUrl: string = findBrand.logo;

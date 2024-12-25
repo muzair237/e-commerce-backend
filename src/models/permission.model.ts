@@ -37,4 +37,13 @@ export class Permission extends Model<Permission> {
     },
   })
   description: string;
+
+  @Column({
+    type: DataType.ARRAY(DataType.STRING),
+    allowNull: false,
+    validate: {
+      notEmpty: true,
+    },
+  })
+  parents: string[];
 }
