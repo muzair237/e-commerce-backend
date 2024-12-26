@@ -97,10 +97,10 @@ export class PermissionsService {
       const parentPermissions = await this.PERMISSION.findAll({
         where: {
           parents: {
-            [Op.eq]: ['$'],
+            [Op.contains]: ['$'],
           },
         },
-        attributes: ['can'],
+        attributes: ['can', 'route'],
       });
       return { success: true, message: 'Parent permissions retrieved successfuly', parentPermissions };
     } catch (err) {

@@ -23,4 +23,16 @@ export const permissionsList = [
     description: 'Can view the permissions page',
     parents: ['$'],
   },
+  {
+    route: '/roles',
+    can: 'roles.nav',
+    description: 'Can view the roles page',
+    parents: ['$'],
+  },
+  {
+    route: '/admins',
+    can: 'admins.nav',
+    description: 'Can view the admins page',
+    parents: ['$'],
+  },
 ];

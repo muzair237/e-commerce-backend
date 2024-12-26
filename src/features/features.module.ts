@@ -4,8 +4,9 @@ import { BrandsModule } from './brands/brands.module';
 import { ProductsModule } from './products/products.module';
 import { SeederModule } from './seeder/seeder.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { RolesModule } from './roles/roles.module';
 
-const featuresModules = [AuthModule, BrandsModule, ProductsModule, SeederModule, PermissionsModule];
+const featuresModules = [AuthModule, BrandsModule, ProductsModule, SeederModule, PermissionsModule, RolesModule];
 
 @Module({
   imports: featuresModules,
