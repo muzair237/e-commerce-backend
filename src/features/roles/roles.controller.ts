@@ -14,17 +14,17 @@ export class RolesController {
   }
 
   @Post('create-role')
-  async createPermissions(@Body() roleData: CreateRoleDto) {
+  async createRole(@Body() roleData: CreateRoleDto) {
     return await this.rolesService.createRole(roleData);
   }
 
-  @Put('update-role')
-  async updatePermissions(@Param('id', ParseIntPipe) id: number, @Body() roleData: CreateRoleDto) {
+  @Put('update-role/:id')
+  async updateRole(@Param('id', ParseIntPipe) id: number, @Body() roleData: CreateRoleDto) {
     return await this.rolesService.updateRole(id, roleData);
   }
 
   @Delete('delete-role/:id')
-  async deletePermission(@Param('id', ParseIntPipe) id: number) {
+  async deleteRole(@Param('id', ParseIntPipe) id: number) {
     return await this.rolesService.deleteRole(id);
   }
 }

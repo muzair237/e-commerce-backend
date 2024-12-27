@@ -14,7 +14,7 @@ export class PermissionsController {
   }
 
   @Post('create-permission')
-  async createPermissions(@Body() permissionData: CreatePermissionDto) {
+  async createPermission(@Body() permissionData: CreatePermissionDto) {
     return await this.permissionsService.createPermission(permissionData);
   }
 

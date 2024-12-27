@@ -1,12 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { AdminRole, Permission, Role, RolePermission } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Sequelize } from 'sequelize-typescript';
-import { Transaction } from 'sequelize';
 
 @Injectable()
 export class RolesService {
@@ -24,7 +23,6 @@ export class RolesService {
 
     let query: any = {};
 
-    // Search filter for type and description
     if (searchText) {
       query = {
         [Op.or]: [{ type: { [Op.iLike]: `%${searchText}%` } }, { description: { [Op.iLike]: `%${searchText}%` } }],
@@ -39,7 +37,7 @@ export class RolesService {
       };
     }
 
-    const sorting: [string, string][] = this.helpers.getSorting(sort, 'can');
+    const sorting: [string, string][] = this.helpers.getSorting(sort, 'type');
 
     try {
       const { count: totalItems, rows: roles } = await this.ROLE.findAndCountAll({
