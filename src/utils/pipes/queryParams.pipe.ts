@@ -4,7 +4,7 @@ import { BeforeQueryParamsInterface } from 'src/utils/interfaces';
 @Injectable()
 export class QueryParamsValidationPipe implements PipeTransform {
   transform(value: BeforeQueryParamsInterface) {
-    const { page, itemsPerPage, getAll, searchText, startDate, endDate, sort } = value;
+    const { page, itemsPerPage, getAll, searchText, startDate, endDate, sort, roleType } = value;
 
     if (page && isNaN(Number(page))) {
       throw new BadRequestException('Page must be a number');
@@ -21,6 +21,9 @@ export class QueryParamsValidationPipe implements PipeTransform {
     if (sort && !['asc', 'desc', 'latest', 'earliest'].includes(sort)) {
       throw new BadRequestException('Sort must be one of: asc, desc, latest, earliest');
     }
+    if (roleType && roleType !== 'all' && isNaN(Number(roleType))) {
+      throw new BadRequestException('Role type must be a number or "all"');
+    }
 
     return {
       page: Number(page) || 1,
@@ -30,6 +33,7 @@ export class QueryParamsValidationPipe implements PipeTransform {
       startDate: startDate ? new Date(new Date(startDate).setHours(0, 0, 0, 0)) : null,
       endDate: endDate ? new Date(new Date(endDate).setHours(23, 59, 59, 999)) : null,
       sort: sort || 'desc',
+      roleType: roleType === 'all' ? 'all' : Number(roleType),
     };
   }
 }

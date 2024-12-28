@@ -32,6 +32,7 @@ export interface BeforeQueryParamsInterface {
   startDate?: string;
   endDate?: string;
   sort?: 'asc' | 'desc' | 'latest' | 'earliest';
+  roleType?: string | number;
 }
 export interface AfterQueryParamsInterface {
   page: number;
@@ -41,6 +42,7 @@ export interface AfterQueryParamsInterface {
   startDate?: Date;
   endDate?: Date;
   sort?: 'asc' | 'desc' | 'latest' | 'earliest';
+  roleType?: string | number;
 }
 
 export interface PaginationResult {

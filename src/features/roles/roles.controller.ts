@@ -13,6 +13,11 @@ export class RolesController {
     return await this.rolesService.getAllRoles(query);
   }
 
+  @Get('get-unique-roles')
+  getUniqueRoles() {
+    return this.rolesService.getUniqueRoles();
+  }
+
   @Post('create-role')
   async createRole(@Body() roleData: CreateRoleDto) {
     return await this.rolesService.createRole(roleData);

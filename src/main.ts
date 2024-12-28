@@ -9,7 +9,7 @@ import * as morgan from 'morgan';
 
 async function bootstrap() {
   const port = process.env.PORT || 4001;
-  const app = await NestFactory.create(AppModule, { logger: false });
+  const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: process.env.ALLOWED_ORIGINS?.split(',') || [],

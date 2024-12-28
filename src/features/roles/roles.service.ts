@@ -83,6 +83,16 @@ export class RolesService {
     }
   }
 
+  async getUniqueRoles() {
+    try {
+      const uniqueRoles = await this.ROLE.findAll({ attributes: ['id', 'type'] });
+
+      return { success: true, message: 'Unique roles retrieved successfully', data: { uniqueRoles } };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
   async createRole(roleData: CreateRoleDto) {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
@@ -108,7 +118,7 @@ export class RolesService {
       }));
 
       if (permissionForThisRole?.length) {
-        await RolePermission.bulkCreate(permissionForThisRole, { transaction });
+        await this.ROLE_PERMISSION.bulkCreate(permissionForThisRole, { transaction });
       }
 
       await transaction.commit();
