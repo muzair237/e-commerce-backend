@@ -1,4 +1,7 @@
-export const brandsList = [
+export const brandsList: {
+  name: string;
+  logo: string;
+}[] = [
   { name: 'Apple', logo: 'apple-logo.png' },
   { name: 'Dell', logo: 'dell-logo.png' },
   { name: 'HP', logo: 'hp-logo.png' },

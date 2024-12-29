@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, Put, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Put, Param, ParseIntPipe, Delete } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { AfterQueryParamsInterface } from 'src/utils/interfaces';
@@ -25,5 +25,10 @@ export class BrandsController {
   @FormDataRequest()
   async updateBrand(@Param('id', ParseIntPipe) id: number, @Body() brand: UpdateBrandDto) {
     return await this.brandsService.updateBrand(id, brand);
+  }
+
+  @Delete('delete-brand/:id')
+  async deleteBrand(@Param('id', ParseIntPipe) id: number) {
+    return await this.brandsService.deleteBrand(id);
   }
 }

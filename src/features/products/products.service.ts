@@ -436,4 +436,31 @@ export class ProductsService {
       this.helpers.handleException(err);
     }
   }
+
+  async deleteProduct(id: number) {
+    try {
+      const findProduct: Product = await this.PRODUCT.findByPk(id);
+      if (!findProduct) {
+        throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const isproductAssociated: ProductVariation = await this.PRODUCT_VARIATION.findOne({ where: { productId: id } });
+
+      if (isproductAssociated) {
+        throw new HttpException(
+          { success: false, message: 'Cannot delete product as it has associated product variants!' },
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      await this.PRODUCT.destroy({ where: { id } });
+
+      return {
+        success: true,
+        message: 'Product deleted successfully',
+      };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
 }

@@ -23,7 +23,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
   providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     console.log('Database connected successfully!');
   }
 }

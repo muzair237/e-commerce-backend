@@ -17,10 +17,10 @@ module.exports = {
   ignorePatterns: ['.eslintrc.js'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    // Ported rules from ExpressJS config
+    '@typescript-eslint/no-explicit-any': 'error',
+
     'no-console': 'warn',
     'object-shorthand': ['error', 'always'],
     'linebreak-style': 0,
@@ -36,7 +36,6 @@ module.exports = {
     'no-useless-return': 'error',
     'no-constant-condition': 'warn',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: 'req|res|next|__' }],
-    // indent: ['error', 2, { SwitchCase: 1 }],
     'no-mixed-spaces-and-tabs': 'warn',
     'space-before-blocks': 'error',
     'space-in-parens': 'error',
@@ -44,7 +43,7 @@ module.exports = {
     'space-unary-ops': 'error',
     quotes: ['error', 'single'],
     'max-len': ['error', { code: 200 }],
-    "prefer-destructuring": ["error", { "object": true, "array": true }],
+    'prefer-destructuring': ['error', { object: true, array: true }],
     'max-lines': ['error', { max: 500 }],
     'keyword-spacing': 'error',
     'multiline-ternary': ['error', 'never'],
@@ -59,5 +58,15 @@ module.exports = {
     'no-var': 'error',
     'prefer-const': 'error',
     'prefer-template': 'warn',
+    // Added rules
+    '@typescript-eslint/typedef': [
+      'warn',
+      {
+        variableDeclaration: true, // Warns if variables lack explicit types
+        parameter: true, // Warns if function parameters lack explicit types
+        propertyDeclaration: true, // Warns if properties lack explicit types
+        memberVariableDeclaration: true, // Warns if member variables lack explicit types
+      },
+    ],
   },
 };

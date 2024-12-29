@@ -64,4 +64,9 @@ export class ProductsController {
   async getProductFiltersOptions() {
     return await this.productsService.getProductFiltersOptions();
   }
+
+  @Delete('delete-product/:id')
+  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+    return await this.productsService.deleteProduct(id);
+  }
 }

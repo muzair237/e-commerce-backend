@@ -135,12 +135,12 @@ export class AdminsService {
     try {
       const { email, roles, ...restData } = adminData;
 
-      const existingAdmin = await this.ADMIN.findByPk(id, { transaction });
+      const existingAdmin: Admin = await this.ADMIN.findByPk(id, { transaction });
       if (!existingAdmin) {
         throw new HttpException({ success: false, message: 'Admin not found' }, HttpStatus.NOT_FOUND);
       }
 
-      const emailExists = await this.ADMIN.findOne({
+      const emailExists: Admin = await this.ADMIN.findOne({
         where: {
           email,
           id: {
@@ -161,7 +161,10 @@ export class AdminsService {
       if (roles) {
         await this.ADMIN_ROLE.destroy({ where: { adminId: id }, transaction });
 
-        const rolesForThisAdmin = roles.map(roleId => ({
+        const rolesForThisAdmin: {
+          adminId: number;
+          roleId: number;
+        }[] = roles.map(roleId => ({
           adminId: id,
           roleId,
         }));
@@ -182,7 +185,7 @@ export class AdminsService {
     try {
       const { newPassword, confirmPassword } = adminData;
 
-      const existingAdmin = await this.ADMIN.findByPk(id);
+      const existingAdmin: Admin = await this.ADMIN.findByPk(id);
       if (!existingAdmin) {
         throw new HttpException({ success: false, message: 'Admin not found' }, HttpStatus.NOT_FOUND);
       }
@@ -191,7 +194,7 @@ export class AdminsService {
         throw new HttpException({ success: false, message: 'Passwords do not match' }, HttpStatus.BAD_REQUEST);
       }
 
-      const hashedPassword = this.helpers.hashPassword(newPassword);
+      const hashedPassword: string = this.helpers.hashPassword(newPassword);
       await this.ADMIN.update({ password: hashedPassword }, { where: { id } });
 
       return { success: true, message: 'Password updated successfully' };
@@ -203,7 +206,7 @@ export class AdminsService {
   async deleteAdmin(id: number) {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
-      const findAdmin = await this.ADMIN.findByPk(id);
+      const findAdmin: Admin = await this.ADMIN.findByPk(id);
       if (!findAdmin) {
         throw new HttpException({ success: false, message: 'Admin not found' }, HttpStatus.NOT_FOUND);
       }

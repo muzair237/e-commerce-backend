@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
-import { Brand } from 'src/models';
+import { Brand, Product } from 'src/models';
 import { CloudinaryService } from 'src/utils/uploadFiles';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -12,6 +12,7 @@ import { AfterQueryParamsInterface } from 'src/utils/interfaces';
 export class BrandsService {
   constructor(
     @InjectModel(Brand) private readonly BRAND: typeof Brand,
+    @InjectModel(Product) private readonly PRODUCT: typeof Product,
     private readonly helpers: Helpers,
     private readonly cloudinary: CloudinaryService,
   ) {}
@@ -120,6 +121,30 @@ export class BrandsService {
       await findBrand.update({ ...brand, logo: logoUrl });
 
       return { success: true, message: 'Brand updated successfully' };
+    } catch (err) {
+      this.helpers.handleException(err);
+    }
+  }
+
+  async deleteBrand(id: number) {
+    try {
+      const findBrand: Brand = await this.BRAND.findByPk(id);
+      if (!findBrand) {
+        throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
+      }
+
+      const isProductAssociated: Product = await this.PRODUCT.findOne({ where: { brandId: id } });
+
+      if (isProductAssociated) {
+        throw new HttpException(
+          { success: false, message: 'This brand is associated with a product. Clear it from the product first.' },
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      await this.BRAND.destroy({ where: { id } });
+
+      return { success: true, message: 'Brand deleted successfully' };
     } catch (err) {
       this.helpers.handleException(err);
     }

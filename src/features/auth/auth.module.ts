@@ -12,7 +12,7 @@ import { AuthAdminMiddleware } from 'src/utils/middlewares/auth.admin.middleware
   providers: [AuthService, Helpers],
 })
 export class AuthModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(AuthAdminMiddleware)
       .exclude({ path: 'auth/login', method: RequestMethod.POST })

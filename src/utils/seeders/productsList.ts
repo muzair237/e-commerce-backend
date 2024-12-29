@@ -9,7 +9,14 @@ import {
   ScreenSizes,
 } from '../enums';
 
-export const productsList = [
+export const productsList: {
+  name: string;
+  model: string;
+  description: string;
+  brandId: number;
+  images: string[];
+  screenSize: ScreenSizes;
+}[] = [
   {
     name: 'Dell XPS 13',
     model: 'XPS9300',

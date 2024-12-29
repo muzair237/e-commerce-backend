@@ -30,7 +30,7 @@ export class UpdateProductDto {
     (value: (MemoryStoredFile | string)[]) => {
       return value.every(item => {
         if (item instanceof MemoryStoredFile) {
-          const mimeType = item.mimetype;
+          const mimeType: string = item.mimetype;
           return mimeType === 'image/jpeg' || mimeType === 'image/jpg' || mimeType === 'image/png';
         }
         return typeof item === 'string';
