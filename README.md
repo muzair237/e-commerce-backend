@@ -1,99 +1,123 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# E-Commerce Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This repository contains the server-side code for my E-commerce Project. The project is built using **NestJS** with **TypeScript** and utilizes **PostgreSQL** as the database, with **Sequelize** as the ORM for database interaction. 
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### ⚠️ **In Progress**  
+This project is still in progress and is not yet completed. I plan to scale it further in the future.
 
-## Description
+## Technologies
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. NestJS (Backend framework)
+2. TypeScript
+3. PostgreSQL (Database)
+4. Sequelize (ORM)
+5. Cloudinary (Image storage)
 
-## Project setup
+## Features
+
+This backend currently includes the following core features:
+
+- **Admins Management**: CRUD functionality for managing admins.
+- **Authentication (Auth)**: User authentication mechanism.
+- **Brands Management**: CRUD operations for managing brands, which will be associated with products.
+- **Product Management**: Complete CRUD for handling products and their dynamic variants (e.g., RAM size, SSD size).
+- **Permissions Management**: Handles roles and permissions assignments.
+- **Role Management**: Allows management of different user roles and their respective permissions.
+- **Admins Management**: Provides management of administrator accounts and their access.
+
+These features have been implemented with scalability and maintainability in mind. The system is designed to be **100% scalable**, with the ability to grow over time.
+
+## Database
+
+The backend uses **PostgreSQL** as the database, and **Sequelize** ORM is used for data management.
+
+## Seeder
+
+A **Seeder** has been implemented to populate the database with initial data for:
+
+- **Permissions** 
+- **Roles**
+- **Admins**
+- **Brands**
+- **Products**
+- **Product Variants**
+
+## Product and Variants Structure
+
+Products are divided into two main parts:
+
+1. **Product (Static data)**: This contains the main product details that remain unchanged.
+2. **Product Variants (Dynamic fields)**: This includes dynamic fields like RAM size, SSD size, etc. Products can have multiple variants with different attributes.
+
+Both the product and its variants are fully **CRUD**-enabled, allowing seamless addition, update, and deletion of products and variants.
+
+## Role-Based Access Control
+
+A complete **Role-Based Access Control (RBAC)** mechanism is implemented to manage user roles and their permissions. This system restricts access to certain parts of the application based on the user's role.
+
+## Image Storage
+
+Images for products and variants are stored using **Cloudinary**.
+
+## Code Organization
+
+The code is organized in a modular way for easy scalability and maintainability. It follows a clean architecture, with separate folders for each feature such as:
+
+- **Auth**: Authentication-related logic.
+- **Admins**: Admin management functionalities.
+- **Brands**: CRUD operations for brands.
+- **Products**: CRUD operations for products and variants.
+- **Roles**: Management of user roles and their permissions.
+
+## Future Plans
+
+This project is built with a vision to scale gradually, adding more features and improvements as required.
+
+## Installation
+
+1. Clone this repository.
 
 ```bash
-$ npm install
+git clone https://github.com/muzair237/e-commerce-backend.git
 ```
 
-## Compile and run the project
+2. Install dependencies.
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+3. Create a .env file in the root directory and configure your PostgreSQL database connection in the .env file as shown below.
 
 ```bash
-# unit tests
-$ npm run test
+PORT = 4008
+ALLOWED_ORIGINS = 'http://localhost:3002'
 
-# e2e tests
-$ npm run test:e2e
+# DATABASE
+DATABASE_URI = 'postgres://postgres:1234@localhost:5432/e-commerce' # Replace it with your database connection URI
 
-# test coverage
-$ npm run test:cov
+# ADMIN
+ADMIN_EMAIL = 'admin@e.com'
+ADMIN_PASSWORD = 'P@ssword1'
+
+# CLOUDINARY
+CLOUD_NAME = 'your-cloud-name'
+API_KEY = "your-api-key"
+API_SECRET = "your-api-secret"
+
+# JWT SECRET
+JWT_SECRET = 'your-jwt-secret'
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+4. Run the application.
 ```bash
-$ npm install -g mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+5. Execute the following API's to populate the initial data.
+```bash
+1. http://localhost:4008/api/seeder/seed-pra
+2. http://localhost:4008/api/seeder/seed-bpv
+```
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Thank you for checking out the project.
