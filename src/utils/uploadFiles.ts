@@ -1,13 +1,17 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import { cloudinaryConfig } from '../config/cloudinary.config';
 import { MemoryStoredFile } from 'nestjs-form-data';
 
 @Injectable()
 export class CloudinaryService {
   constructor(private readonly configService: ConfigService) {
-    const config = cloudinaryConfig(this.configService);
+    const config: {
+      cloud_name: string;
+      api_key: string;
+      api_secret: string;
+    } = cloudinaryConfig(this.configService);
     cloudinary.config(config);
   }
 
@@ -18,7 +22,9 @@ export class CloudinaryService {
    */
   async uploadSingleFile(file: MemoryStoredFile): Promise<string> {
     try {
-      const result = await cloudinary.uploader.upload(`data:image/jpeg;base64,${file.buffer.toString('base64')}`);
+      const result: UploadApiResponse = await cloudinary.uploader.upload(
+        `data:image/jpeg;base64,${file.buffer.toString('base64')}`,
+      );
       return result.secure_url;
     } catch (error) {
       throw new HttpException(`Error in uploading file: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -36,8 +42,8 @@ export class CloudinaryService {
         return [];
       }
 
-      const uploadPromises = files.map(image => this.uploadSingleFile(image));
-      const uploadedFiles = await Promise.all(uploadPromises);
+      const uploadPromises: Promise<string>[] = files.map(image => this.uploadSingleFile(image));
+      const uploadedFiles: string[] = await Promise.all(uploadPromises);
 
       return uploadedFiles.filter((url: string) => url !== '');
     } catch (error) {
@@ -51,7 +57,7 @@ export class CloudinaryService {
    */
   async deleteImage(url: string): Promise<void> {
     try {
-      const publicId = this.extractPublicId(url);
+      const publicId: string = this.extractPublicId(url);
       const { result } = await cloudinary.uploader.destroy(publicId);
       if (result !== 'ok') {
         throw new Error(`Failed to delete image with public ID: ${publicId}`);
@@ -71,17 +77,17 @@ export class CloudinaryService {
     const updatedImages: string[] = [];
 
     for (const element of newImages) {
-      const image = element;
+      const image: string | MemoryStoredFile = element;
 
       if (typeof image === 'string') {
         updatedImages.push(image);
       } else if (image instanceof MemoryStoredFile) {
-        const uploadedUrl = await this.uploadSingleFile(image);
+        const uploadedUrl: string = await this.uploadSingleFile(image);
         updatedImages.push(uploadedUrl);
       }
     }
 
-    const imagesToDelete = existingImages.filter(url => !updatedImages.includes(url));
+    const imagesToDelete: string[] = existingImages.filter(url => !updatedImages.includes(url));
     for (const url of imagesToDelete) {
       await this.deleteImage(url);
     }
@@ -96,8 +102,8 @@ export class CloudinaryService {
    */
   extractPublicId(url: string): string | null {
     try {
-      const parts = url.split('/');
-      const filename = parts[parts.length - 1];
+      const parts: string[] = url.split('/');
+      const filename: string = parts[parts.length - 1];
       return filename.split('.')[0];
     } catch {
       return null;

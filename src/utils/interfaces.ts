@@ -46,7 +46,7 @@ export interface AfterQueryParamsInterface {
 }
 
 export interface PaginationResult {
-  items: any[];
+  items: unknown[];
   currentPage: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
@@ -54,4 +54,16 @@ export interface PaginationResult {
   previousPage: number;
   lastPage: number;
   totalItems: number;
+}
+
+export interface GetAllApiResponse {
+  success: boolean;
+  message: string;
+  data: PaginationResult;
+}
+
+export interface GeneralApiResponse {
+  success: boolean;
+  message: string;
+  data?: object;
 }

@@ -7,7 +7,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { AdminsModule } from './admins/admins.module';
 
-const featuresModules = [
+const featuresModules: (typeof SeederModule)[] = [
   AuthModule,
   BrandsModule,
   ProductsModule,

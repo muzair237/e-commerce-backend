@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { getEnvVariables } from './configuration';
 
+// eslint-disable-next-line @typescript-eslint/typedef
 export const cloudinaryConfig = (
   configService: ConfigService,
 ): {

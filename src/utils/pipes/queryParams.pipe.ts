@@ -1,9 +1,9 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
-import { BeforeQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, BeforeQueryParamsInterface } from 'src/utils/interfaces';
 
 @Injectable()
 export class QueryParamsValidationPipe implements PipeTransform {
-  transform(value: BeforeQueryParamsInterface) {
+  transform(value: BeforeQueryParamsInterface): AfterQueryParamsInterface {
     const { page, itemsPerPage, getAll, searchText, startDate, endDate, sort, roleType } = value;
 
     if (page && isNaN(Number(page))) {

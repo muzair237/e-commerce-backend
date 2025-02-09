@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AfterQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, GeneralApiResponse, GetAllApiResponse } from 'src/utils/interfaces';
 import { InjectModel } from '@nestjs/sequelize';
 import { Permission, RolePermission } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
@@ -14,10 +14,10 @@ export class PermissionsService {
     private readonly helpers: Helpers,
   ) {}
 
-  async getAllPermissions(queryParams: AfterQueryParamsInterface) {
+  async getAllPermissions(queryParams: AfterQueryParamsInterface): Promise<GetAllApiResponse> {
     const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort } = queryParams;
 
-    let query: any = {};
+    let query: Record<string, unknown> = {};
 
     if (searchText) {
       query = {
@@ -71,11 +71,11 @@ export class PermissionsService {
     }
   }
 
-  async createPermission(permissionData: CreatePermissionDto) {
+  async createPermission(permissionData: CreatePermissionDto): Promise<GeneralApiResponse> {
     try {
       const { can, route, description, parents } = permissionData;
 
-      const findPermission = await this.PERMISSION.findOne({ where: { can } });
+      const findPermission: Permission = await this.PERMISSION.findOne({ where: { can } });
 
       if (findPermission) {
         throw new HttpException(
@@ -92,9 +92,9 @@ export class PermissionsService {
     }
   }
 
-  async getUnqiueParents() {
+  async getUnqiueParents(): Promise<GeneralApiResponse> {
     try {
-      const parentPermissions = await this.PERMISSION.findAll({
+      const parentPermissions: Permission[] = await this.PERMISSION.findAll({
         where: {
           parents: {
             [Op.contains]: ['$'],
@@ -102,23 +102,23 @@ export class PermissionsService {
         },
         attributes: ['can', 'route'],
       });
-      return { success: true, message: 'Parent permissions retrieved successfuly', parentPermissions };
+      return { success: true, message: 'Parent permissions retrieved successfuly', data: parentPermissions };
     } catch (err) {
       this.helpers.handleException(err);
     }
   }
 
-  async updatePermission(id: number, permissionData: CreatePermissionDto) {
+  async updatePermission(id: number, permissionData: CreatePermissionDto): Promise<GeneralApiResponse> {
     try {
       const { can, route, description, parents } = permissionData;
 
-      const findPermission = await this.PERMISSION.findByPk(id);
+      const findPermission: Permission = await this.PERMISSION.findByPk(id);
 
       if (!findPermission) {
         throw new HttpException({ success: false, message: 'Permission not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const isPermissionExists = await this.PERMISSION.findOne({
+      const isPermissionExists: Permission = await this.PERMISSION.findOne({
         where: {
           can,
           id: {
@@ -142,15 +142,15 @@ export class PermissionsService {
     }
   }
 
-  async deletePermission(id: number) {
+  async deletePermission(id: number): Promise<GeneralApiResponse> {
     try {
-      const findPermission = await this.PERMISSION.findByPk(id);
+      const findPermission: Permission = await this.PERMISSION.findByPk(id);
 
       if (!findPermission) {
         throw new HttpException({ success: false, message: 'Permission not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const ifRoleAsociated = await this.ROLE_PERMISSION.findOne({ where: { permissionId: id } });
+      const ifRoleAsociated: RolePermission = await this.ROLE_PERMISSION.findOne({ where: { permissionId: id } });
 
       if (ifRoleAsociated) {
         throw new HttpException(
@@ -161,7 +161,7 @@ export class PermissionsService {
 
       await this.PERMISSION.destroy({ where: { id } });
 
-      return { success: true, messge: 'Permission deleted successfully' };
+      return { success: true, message: 'Permission deleted successfully' };
     } catch (err) {
       this.helpers.handleException(err);
     }

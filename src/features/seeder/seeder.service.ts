@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { Helpers } from 'src/utils/helpers';
 import { getEnvVariables } from 'src/config/configuration';
 import { Sequelize } from 'sequelize-typescript';
+import { GeneralApiResponse } from 'src/utils/interfaces';
 
 @Injectable()
 export class SeederService {
@@ -31,13 +32,13 @@ export class SeederService {
     ({ ADMIN_EMAIL: this.ADMIN_EMAIL, ADMIN_PASSWORD: this.ADMIN_PASSWORD } = getEnvVariables(configService));
   }
 
-  async seedPermissionsAndRoles(transaction: Transaction) {
+  async seedPermissionsAndRoles(transaction: Transaction): Promise<void> {
     try {
       for (const permission of permissionsList) {
         await this.PERMISSION.upsert(permission, { transaction });
       }
 
-      const permissions = await this.PERMISSION.findAll({ transaction });
+      const permissions: Permission[] = await this.PERMISSION.findAll({ transaction });
 
       const [role] = await this.ROLE.upsert(
         {
@@ -64,9 +65,9 @@ export class SeederService {
     }
   }
 
-  async createFirstAdmin(transaction: Transaction) {
+  async createFirstAdmin(transaction: Transaction): Promise<void> {
     try {
-      const role = await this.ROLE.findOne({
+      const role: Role = await this.ROLE.findOne({
         where: { type: 'SUPER_ADMIN' },
         transaction,
       });
@@ -98,8 +99,8 @@ export class SeederService {
     }
   }
 
-  async seedRPA() {
-    const transaction = await this.sequelize.transaction();
+  async seedRPA(): Promise<GeneralApiResponse> {
+    const transaction: Transaction = await this.sequelize.transaction();
 
     try {
       await this.seedPermissionsAndRoles(transaction);
@@ -107,14 +108,14 @@ export class SeederService {
 
       await transaction.commit();
 
-      return { message: 'Permissions, Roles, and Admin seeded successfully' };
+      return { success: true, message: 'Permissions, Roles, and Admin seeded successfully' };
     } catch (err) {
       await transaction.rollback();
       throw new HttpException(`Seeding failed: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async seedBrands(transaction: Transaction) {
+  async seedBrands(transaction: Transaction): Promise<void> {
     try {
       for (const brand of brandsList) {
         await this.BRAND.upsert(brand, { transaction });
@@ -124,14 +125,14 @@ export class SeederService {
     }
   }
 
-  async seedProducts(transaction: Transaction) {
+  async seedProducts(transaction: Transaction): Promise<void> {
     try {
-      const brands = await this.BRAND.findAll({ transaction });
+      const brands: Brand[] = await this.BRAND.findAll({ transaction });
 
-      const brandIds = brands.map(brand => brand.id);
+      const brandIds: number[] = brands.map(brand => brand.id);
 
       for (const product of productsList) {
-        const randomBrandId = brandIds[Math.floor(Math.random() * brandIds.length)];
+        const randomBrandId: number = brandIds[Math.floor(Math.random() * brandIds.length)];
 
         product.brandId = randomBrandId;
 
@@ -142,18 +143,18 @@ export class SeederService {
     }
   }
 
-  async seedProductVariations(transaction: Transaction) {
+  async seedProductVariations(transaction: Transaction): Promise<void> {
     try {
-      const products = await this.PRODUCT.findAll({ transaction });
+      const products: Product[] = await this.PRODUCT.findAll({ transaction });
 
-      const productIds = products.map(product => product.id);
+      const productIds: number[] = products.map(product => product.id);
 
       for (const variation of productVariationsList) {
-        const randomProductId = productIds[Math.floor(Math.random() * productIds.length)];
+        const randomProductId: number = productIds[Math.floor(Math.random() * productIds.length)];
 
         variation.productId = randomProductId;
 
-        const existingVariation = await this.PRODUCT_VARIATION.findOne({
+        const existingVariation: ProductVariation = await this.PRODUCT_VARIATION.findOne({
           where: {
             productId: variation.productId,
           },
@@ -169,8 +170,8 @@ export class SeederService {
     }
   }
 
-  async seedBPV() {
-    const transaction = await this.sequelize.transaction();
+  async seedBPV(): Promise<GeneralApiResponse> {
+    const transaction: Transaction = await this.sequelize.transaction();
 
     try {
       await this.seedBrands(transaction);
@@ -178,7 +179,7 @@ export class SeederService {
       await this.seedProductVariations(transaction);
 
       await transaction.commit();
-      return { message: 'Brands, Products, and Product Variations seeded successfully' };
+      return { success: true, message: 'Brands, Products, and Product Variations seeded successfully' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(`Database seeding failed: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);

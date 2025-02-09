@@ -14,7 +14,7 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
   providers: [BrandsService, Helpers, CloudinaryService],
 })
 export class BrandsModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer.apply(AuthAdminMiddleware).forRoutes(BrandsController);
   }
 }

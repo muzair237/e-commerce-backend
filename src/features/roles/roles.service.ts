@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op, Transaction } from 'sequelize';
 import { AdminRole, Permission, Role, RolePermission } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
-import { AfterQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, GeneralApiResponse, GetAllApiResponse } from 'src/utils/interfaces';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -18,10 +18,10 @@ export class RolesService {
     private readonly sequelize: Sequelize,
   ) {}
 
-  async getAllRoles(queryParams: AfterQueryParamsInterface) {
+  async getAllRoles(queryParams: AfterQueryParamsInterface): Promise<GetAllApiResponse> {
     const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort } = queryParams;
 
-    let query: any = {};
+    let query: Record<string, unknown> = {};
 
     if (searchText) {
       query = {
@@ -69,7 +69,7 @@ export class RolesService {
               description: role.description,
               created_at: role.created_at,
               updated_at: role.updated_at,
-              permissions: role.permissions.map(permission => permission.id),
+              permissions: role.permissions.map((permission: Permission) => permission.id),
             })),
             page,
             totalItems,
@@ -83,9 +83,9 @@ export class RolesService {
     }
   }
 
-  async getUniqueRoles() {
+  async getUniqueRoles(): Promise<GeneralApiResponse> {
     try {
-      const uniqueRoles = await this.ROLE.findAll({ attributes: ['id', 'type'] });
+      const uniqueRoles: Role[] = await this.ROLE.findAll({ attributes: ['id', 'type'] });
 
       return { success: true, message: 'Unique roles retrieved successfully', data: { uniqueRoles } };
     } catch (err) {
@@ -93,12 +93,12 @@ export class RolesService {
     }
   }
 
-  async createRole(roleData: CreateRoleDto) {
+  async createRole(roleData: CreateRoleDto): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const { type, description, permissions } = roleData;
 
-      const findRole = await this.ROLE.findOne({
+      const findRole: Role = await this.ROLE.findOne({
         where: { type },
         transaction,
       });
@@ -110,9 +110,12 @@ export class RolesService {
         );
       }
 
-      const createdRole = await this.ROLE.create({ type, description }, { transaction });
+      const createdRole: Role = await this.ROLE.create({ type, description }, { transaction });
 
-      const permissionForThisRole = permissions?.map(permissionId => ({
+      const permissionForThisRole: {
+        roleId: number;
+        permissionId: number;
+      }[] = permissions?.map(permissionId => ({
         roleId: createdRole.id,
         permissionId,
       }));
@@ -130,17 +133,17 @@ export class RolesService {
     }
   }
 
-  async updateRole(id: number, roleData: CreateRoleDto) {
+  async updateRole(id: number, roleData: CreateRoleDto): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const { type, description, permissions } = roleData;
 
-      const findRole = await this.ROLE.findByPk(id, { transaction });
+      const findRole: Role = await this.ROLE.findByPk(id, { transaction });
       if (!findRole) {
         throw new HttpException({ success: false, message: 'Role not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const existingRole = await this.ROLE.findOne({
+      const existingRole: Role = await this.ROLE.findOne({
         where: { type, id: { [Op.ne]: id } },
         transaction,
       });
@@ -155,7 +158,10 @@ export class RolesService {
 
       await this.ROLE_PERMISSION.destroy({ where: { roleId: id }, transaction });
 
-      const permissionForThisRole = permissions?.map(permissionId => ({
+      const permissionForThisRole: {
+        roleId: number;
+        permissionId: number;
+      }[] = permissions?.map(permissionId => ({
         roleId: id,
         permissionId,
       }));
@@ -172,15 +178,15 @@ export class RolesService {
     }
   }
 
-  async deleteRole(id: number) {
+  async deleteRole(id: number): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
-      const findRole = await this.ROLE.findByPk(id, { transaction });
+      const findRole: Role = await this.ROLE.findByPk(id, { transaction });
       if (!findRole) {
         throw new HttpException({ success: false, message: 'Role not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const isRoleAssociatedWithAdmin = await this.ADMIN_ROLE.findOne({
+      const isRoleAssociatedWithAdmin: AdminRole = await this.ADMIN_ROLE.findOne({
         where: { roleId: id },
         transaction,
       });

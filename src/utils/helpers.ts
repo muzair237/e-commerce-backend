@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/typedef */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
@@ -20,7 +21,7 @@ export class Helpers {
   }
 
   pagination = (
-    items: any[] = [],
+    items: unknown[] = [],
     page: number = 1,
     totalItems: number = 0,
     itemsPerPage: number = 10,
@@ -118,15 +119,25 @@ export class Helpers {
     return brands.map(e => e.id);
   };
 
-  handleException = (err: any) => {
+  handleException = (err: unknown): void => {
     if (err instanceof HttpException) {
       throw err;
+    }
+
+    if (err instanceof Error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: err.message || 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     throw new HttpException(
       {
         success: false,
-        message: err.message || 'Internal server error',
+        message: 'Internal server error',
       },
       HttpStatus.INTERNAL_SERVER_ERROR,
     );

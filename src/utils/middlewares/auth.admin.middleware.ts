@@ -38,12 +38,12 @@ export class AuthAdminMiddleware implements NestMiddleware {
     }
 
     try {
-      const decodedToken = jwt.verify(token, this.JWT_SECRET) as {
+      const decodedToken: { id: number; email: string } = jwt.verify(token, this.JWT_SECRET) as {
         id: number;
         email: string;
       };
 
-      const admin = await this.ADMIN.findByPk(decodedToken.id, {
+      const admin: Admin = await this.ADMIN.findByPk(decodedToken.id, {
         attributes: { exclude: ['password', 'created_at', 'updated_at'] },
         include: [
           {

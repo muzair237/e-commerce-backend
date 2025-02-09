@@ -6,7 +6,7 @@ import { CloudinaryService } from 'src/utils/uploadFiles';
 import { Helpers } from 'src/utils/helpers';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
-import { AfterQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, GeneralApiResponse, GetAllApiResponse } from 'src/utils/interfaces';
 
 @Injectable()
 export class BrandsService {
@@ -17,10 +17,10 @@ export class BrandsService {
     private readonly cloudinary: CloudinaryService,
   ) {}
 
-  async getAllBrands(queryParams: AfterQueryParamsInterface) {
+  async getAllBrands(queryParams: AfterQueryParamsInterface): Promise<GetAllApiResponse> {
     const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort } = queryParams;
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
 
     if (searchText) {
       query.name = {
@@ -58,11 +58,11 @@ export class BrandsService {
     }
   }
 
-  async createBrand(brand: CreateBrandDto) {
+  async createBrand(brand: CreateBrandDto): Promise<GeneralApiResponse> {
     try {
       const { name, logo } = brand;
 
-      const findBrand = await this.BRAND.findOne({ where: { name } });
+      const findBrand: Brand = await this.BRAND.findOne({ where: { name } });
       if (findBrand) {
         throw new HttpException(
           { success: false, message: `Brand with the name ${name} already exists!` },
@@ -70,7 +70,7 @@ export class BrandsService {
         );
       }
 
-      const logoUrl = await this.cloudinary.uploadSingleFile(logo);
+      const logoUrl: string = await this.cloudinary.uploadSingleFile(logo);
 
       await this.BRAND.create({
         ...brand,
@@ -86,15 +86,15 @@ export class BrandsService {
     }
   }
 
-  async updateBrand(id: number, brand: UpdateBrandDto) {
+  async updateBrand(id: number, brand: UpdateBrandDto): Promise<GeneralApiResponse> {
     try {
       const { logo } = brand;
-      const findBrand = await this.BRAND.findByPk(id);
+      const findBrand: Brand = await this.BRAND.findByPk(id);
       if (!findBrand) {
         throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const isBrandExists = await this.BRAND.findOne({
+      const isBrandExists: Brand = await this.BRAND.findOne({
         where: {
           name: brand?.name,
           id: {
@@ -126,7 +126,7 @@ export class BrandsService {
     }
   }
 
-  async deleteBrand(id: number) {
+  async deleteBrand(id: number): Promise<GeneralApiResponse> {
     try {
       const findBrand: Brand = await this.BRAND.findByPk(id);
       if (!findBrand) {

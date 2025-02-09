@@ -17,7 +17,7 @@ import { CloudinaryService } from 'src/utils/uploadFiles';
   providers: [ProductsService, Helpers, CloudinaryService],
 })
 export class ProductsModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer.apply(AuthAdminMiddleware).forRoutes(ProductsController);
   }
 }

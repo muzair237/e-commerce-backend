@@ -12,7 +12,7 @@ import { AuthAdminMiddleware } from 'src/utils/middlewares/auth.admin.middleware
   providers: [AdminsService, Helpers],
 })
 export class AdminsModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer.apply(AuthAdminMiddleware).forRoutes(AdminsController);
   }
 }

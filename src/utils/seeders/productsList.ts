@@ -75,7 +75,26 @@ export const productsList: {
   },
 ];
 
-export const productVariationsList = [
+export const productVariationsList: {
+  productId: number;
+  storage: {
+    type: StorageTypes;
+    size: StorageSizes;
+  };
+  ram: RamSizes;
+  processor: {
+    name: ProcessorNames;
+    generation: ProcessorGenerations;
+  };
+  graphicsCard: {
+    isGraphicsCard: boolean;
+    type?: GraphicsCardTypes;
+    memory?: GraphicsCardMemorySizes;
+  };
+  quantity: number;
+  costPrice: number;
+  salePrice: number;
+}[] = [
   {
     productId: 1,
     storage: {

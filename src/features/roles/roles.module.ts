@@ -12,7 +12,7 @@ import { Helpers } from 'src/utils/helpers';
   providers: [RolesService, Helpers],
 })
 export class RolesModule implements NestModule {
-  public configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer.apply(AuthAdminMiddleware).forRoutes(RolesController);
   }
 }

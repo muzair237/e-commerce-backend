@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op, Transaction } from 'sequelize';
 import { Admin, AdminJwt, AdminRole, Role } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
-import { AfterQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, GeneralApiResponse, GetAllApiResponse } from 'src/utils/interfaces';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
@@ -18,11 +18,11 @@ export class AdminsService {
     private readonly sequelize: Sequelize,
   ) {}
 
-  async getAllAdmins(queryParams: AfterQueryParamsInterface) {
+  async getAllAdmins(queryParams: AfterQueryParamsInterface): Promise<GetAllApiResponse> {
     const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort, roleType } = queryParams;
 
-    let adminQuery: any = {};
-    const roleQuery: any = {};
+    let adminQuery: Record<string, unknown> = {};
+    const roleQuery: Record<string, unknown> = {};
 
     if (roleType && roleType !== 'all') {
       roleQuery.id = roleType;
@@ -69,14 +69,23 @@ export class AdminsService {
         message: 'Admins retrieved successfully',
         data: {
           ...this.helpers.pagination(
-            admins.map((admin: any) => ({
-              id: admin.id,
-              name: admin.name,
-              email: admin.email,
-              roles: admin.roles.map(role => role.type),
-              created_at: admin.created_at?.toISOString(),
-              updated_at: admin.updated_at?.toISOString(),
-            })),
+            admins.map(
+              (admin: {
+                id: number;
+                name: string;
+                email: string;
+                roles: Role[];
+                created_at?: Date;
+                updated_at?: Date;
+              }) => ({
+                id: admin.id,
+                name: admin.name,
+                email: admin.email,
+                roles: admin.roles.map((role: Role) => role.type),
+                created_at: admin.created_at?.toISOString(),
+                updated_at: admin.updated_at?.toISOString(),
+              }),
+            ),
             page,
             totalItems,
             itemsPerPage,
@@ -89,12 +98,12 @@ export class AdminsService {
     }
   }
 
-  async createAdmin(adminData: CreateAdminDto) {
+  async createAdmin(adminData: CreateAdminDto): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const { name, email, newPassword, confirmPassword, roles } = adminData;
 
-      const findAdmin = await this.ADMIN.findOne({ where: { email }, transaction });
+      const findAdmin: Admin = await this.ADMIN.findOne({ where: { email }, transaction });
       if (findAdmin) {
         throw new HttpException(
           { success: false, message: `Admin with the email ${email} already exists!` },
@@ -106,10 +115,13 @@ export class AdminsService {
         throw new HttpException({ success: false, message: 'Passwords do not match' }, HttpStatus.BAD_REQUEST);
       }
 
-      const hashedPassword = this.helpers.hashPassword(newPassword);
-      const createdAdmin = await this.ADMIN.create({ name, email, password: hashedPassword });
+      const hashedPassword: string = this.helpers.hashPassword(newPassword);
+      const createdAdmin: Admin = await this.ADMIN.create({ name, email, password: hashedPassword });
 
-      const rolesForThisAdmin = roles?.map(roleId => ({
+      const rolesForThisAdmin: {
+        adminId: number;
+        roleId: number;
+      }[] = roles?.map(roleId => ({
         adminId: createdAdmin?.id,
         roleId,
       }));
@@ -130,7 +142,7 @@ export class AdminsService {
     }
   }
 
-  async updateAdmin(id: number, adminData: UpdateAdminDto) {
+  async updateAdmin(id: number, adminData: UpdateAdminDto): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const { email, roles, ...restData } = adminData;
@@ -181,7 +193,7 @@ export class AdminsService {
     }
   }
 
-  async updatePassword(id: number, adminData: UpdateAdminDto) {
+  async updatePassword(id: number, adminData: UpdateAdminDto): Promise<GeneralApiResponse> {
     try {
       const { newPassword, confirmPassword } = adminData;
 
@@ -203,7 +215,7 @@ export class AdminsService {
     }
   }
 
-  async deleteAdmin(id: number) {
+  async deleteAdmin(id: number): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const findAdmin: Admin = await this.ADMIN.findByPk(id);

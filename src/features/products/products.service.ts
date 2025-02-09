@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { Op, Transaction } from 'sequelize';
 import { Brand, Product, ProductVariation } from 'src/models';
 import { Helpers } from 'src/utils/helpers';
-import { AfterQueryParamsInterface } from 'src/utils/interfaces';
+import { AfterQueryParamsInterface, GeneralApiResponse, GetAllApiResponse } from 'src/utils/interfaces';
 import { CreateProductDto, ProductVariationDto } from './dto/create-product.dto';
 import { CloudinaryService } from 'src/utils/uploadFiles';
 import { MemoryStoredFile } from 'nestjs-form-data';
@@ -32,11 +32,11 @@ export class ProductsService {
     private readonly sequelize: Sequelize,
   ) {}
 
-  async getAllProducts(queryParams: AfterQueryParamsInterface) {
+  async getAllProducts(queryParams: AfterQueryParamsInterface): Promise<GetAllApiResponse> {
     try {
       const { page = 1, itemsPerPage = 10, getAll, searchText, startDate, endDate, sort } = queryParams;
 
-      let query: any = {};
+      let query: Record<string, unknown> = {};
 
       if (searchText) {
         query = {
@@ -113,7 +113,7 @@ export class ProductsService {
     }
   }
 
-  async advancedProductSearch(advancedSearchFilters: ProductsAdvancedSearchDTO) {
+  async advancedProductSearch(advancedSearchFilters: ProductsAdvancedSearchDTO): Promise<GetAllApiResponse> {
     try {
       const { page, itemsPerPage, getAll } = advancedSearchFilters;
       const {
@@ -131,8 +131,8 @@ export class ProductsService {
         sort,
       } = advancedSearchFilters;
 
-      const productQuery: any = {};
-      const variationQuery: any = {};
+      const productQuery: Record<string | symbol, unknown> = {};
+      const variationQuery: Record<string, unknown> = {};
 
       if (searchText) {
         productQuery[Op.or] = [
@@ -215,7 +215,7 @@ export class ProductsService {
     }
   }
 
-  async createProduct(productData: CreateProductDto) {
+  async createProduct(productData: CreateProductDto): Promise<GeneralApiResponse> {
     const transaction: Transaction = await this.sequelize.transaction();
     try {
       const { product, variations } = productData;
@@ -261,11 +261,11 @@ export class ProductsService {
     }
   }
 
-  async updateProduct(id: number, productData: UpdateProductDto) {
+  async updateProduct(id: number, productData: UpdateProductDto): Promise<GeneralApiResponse> {
     try {
       const { name, model, description, brandId, images, screenSize } = productData;
 
-      const findProduct = await this.PRODUCT.findByPk(id);
+      const findProduct: Product = await this.PRODUCT.findByPk(id);
       if (!findProduct) {
         throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
       }
@@ -285,12 +285,15 @@ export class ProductsService {
         );
       }
 
-      const findBrand = await this.BRAND.findByPk(brandId);
+      const findBrand: Brand = await this.BRAND.findByPk(brandId);
       if (!findBrand) {
         throw new HttpException({ success: false, message: 'Brand not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const updatedImages = await this.cloudinary.handleImageUpdates(findProduct.images, images || findProduct.images);
+      const updatedImages: string[] = await this.cloudinary.handleImageUpdates(
+        findProduct.images,
+        images || findProduct.images,
+      );
 
       await this.PRODUCT.update(
         { name, model, description, brandId, images: updatedImages, screenSize },
@@ -303,14 +306,14 @@ export class ProductsService {
     }
   }
 
-  async createProductVariant(productId: number, productVariantData: ProductVariationDto) {
+  async createProductVariant(productId: number, productVariantData: ProductVariationDto): Promise<GeneralApiResponse> {
     try {
-      const findProduct = await this.PRODUCT.findByPk(productId);
+      const findProduct: Product = await this.PRODUCT.findByPk(productId);
       if (!findProduct) {
         throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const existingVariant = await this.PRODUCT_VARIATION.findOne({
+      const existingVariant: ProductVariation = await this.PRODUCT_VARIATION.findOne({
         where: {
           productId,
           storage: productVariantData.storage,
@@ -338,13 +341,13 @@ export class ProductsService {
     }
   }
 
-  async updateProductVariant(variantId: number, productVariantData: ProductVariationDto) {
+  async updateProductVariant(variantId: number, productVariantData: ProductVariationDto): Promise<GeneralApiResponse> {
     try {
-      const findVariant = await this.PRODUCT_VARIATION.findByPk(variantId);
+      const findVariant: ProductVariation = await this.PRODUCT_VARIATION.findByPk(variantId);
       if (!findVariant) {
         throw new HttpException({ success: false, message: 'Product variant not found!' }, HttpStatus.NOT_FOUND);
       }
-      const existingVariant = await this.PRODUCT_VARIATION.findOne({
+      const existingVariant: ProductVariation = await this.PRODUCT_VARIATION.findOne({
         where: {
           id: { [Op.ne]: variantId },
           productId: findVariant?.productId,
@@ -373,9 +376,9 @@ export class ProductsService {
     }
   }
 
-  async deleteProductVariant(id: number) {
+  async deleteProductVariant(id: number): Promise<GeneralApiResponse> {
     try {
-      const findVariant = await this.PRODUCT_VARIATION.findByPk(id);
+      const findVariant: ProductVariation = await this.PRODUCT_VARIATION.findByPk(id);
       if (!findVariant) {
         throw new HttpException({ success: false, message: 'Product variant not found!' }, HttpStatus.NOT_FOUND);
       }
@@ -391,14 +394,14 @@ export class ProductsService {
     }
   }
 
-  async getProductVariations(id: number) {
+  async getProductVariations(id: number): Promise<GeneralApiResponse> {
     try {
       const findProduct: Product = await this.PRODUCT.findByPk(id);
       if (!findProduct) {
         throw new HttpException({ success: false, message: 'Product not found!' }, HttpStatus.NOT_FOUND);
       }
 
-      const productVariations = await this.PRODUCT_VARIATION.findAll({
+      const productVariations: ProductVariation[] = await this.PRODUCT_VARIATION.findAll({
         where: { productId: id },
         order: [['created_at', 'ASC']],
       });
@@ -413,9 +416,9 @@ export class ProductsService {
     }
   }
 
-  async getProductFiltersOptions() {
+  async getProductFiltersOptions(): Promise<GeneralApiResponse> {
     try {
-      const brands = await this.BRAND.findAll({ attributes: ['id', 'name'] });
+      const brands: Brand[] = await this.BRAND.findAll({ attributes: ['id', 'name'] });
 
       return {
         success: true,
@@ -437,7 +440,7 @@ export class ProductsService {
     }
   }
 
-  async deleteProduct(id: number) {
+  async deleteProduct(id: number): Promise<GeneralApiResponse> {
     try {
       const findProduct: Product = await this.PRODUCT.findByPk(id);
       if (!findProduct) {
